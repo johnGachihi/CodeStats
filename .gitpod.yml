@@ -3,10 +3,9 @@ image:
 
 tasks:
   - name: server
-    init: cd server-reactive && ./gradlew build
-    command: cd server-reactive && ./gradlew bootRun
+    init: cd /workspace/CodeStats/server-reactive && ./gradlew build
+    command: cd /workspace/CodeStats/server-reactive &&./gradlew bootRun
 
 vscode:
   extensions:
     - vscjava.vscode-java-pack
-
