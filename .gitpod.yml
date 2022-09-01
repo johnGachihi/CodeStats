@@ -1,0 +1,22 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - name: start mongodb
+    command: |
+      # For some reason server build fails when mongod is running
+      # thus wait until its done.
+      gp sync-await server-build
+      mongod
+
+  - name: server app
+    init: |
+      cd /workspace/CodeStats/server-reactive && ./gradlew build
+      gp sync-done server-build
+    command: |
+      cd /workspace/CodeStats/server-reactive &&./gradlew bootRun
+
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack
+    - pivotal.vscode-spring-boot
