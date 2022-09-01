@@ -4,6 +4,8 @@ image:
 tasks:
   - name: start mongodb
     command: |
+      # For some reason server build fails when mongod is running
+      # thus wait until its done.
       gp sync-await server-build
       mongod
 
