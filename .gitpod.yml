@@ -1,2 +1,12 @@
 image:
   file: .gitpod.Dockerfile
+
+tasks:
+  - name: server
+    init: cd server-reactive && ./gradlew build
+    command: cd server-reactive && ./gradlew bootRun
+
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack
+
