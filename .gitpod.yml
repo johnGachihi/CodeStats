@@ -2,7 +2,10 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - name: server
+  - name: mongodb
+    command: mongod
+
+  - name: server app
     init: cd /workspace/CodeStats/server-reactive && ./gradlew build
     command: cd /workspace/CodeStats/server-reactive &&./gradlew bootRun
 
