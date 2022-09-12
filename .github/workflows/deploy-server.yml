@@ -1,0 +1,39 @@
+name: deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server-reactive/**'
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1.0.4
+
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Run tests
+        run: cd server-reactive && ./gradlew test
+
+      - name: Build image
+        run: cd server-reactive && ./gradlew bootBuildImage
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy
+        run: cd server-reactive && flyctl deploy --image codestats-server --detach
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

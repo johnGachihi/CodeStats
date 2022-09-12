@@ -7,4 +7,5 @@
     <file type="web" url="file://$PROJECT_DIR$/server" />
     <file type="web" url="file://$PROJECT_DIR$/server-reactive" />
   </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="17" project-jdk-type="JavaSDK" />
 </project>
