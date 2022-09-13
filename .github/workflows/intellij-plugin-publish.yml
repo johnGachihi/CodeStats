@@ -45,7 +45,7 @@ jobs:
       - name: Publish plugin
         env:
           PUBLISH_TOKEN: ${{ secrets.INTELLIJ_PLUGIN_PUBLISH_TOKEN }}
-        run: ./gradlew publishPlugin
+        run: cd intellij-plugin && ./gradlew publishPlugin
 
       - name: Upload release asset
         env:
