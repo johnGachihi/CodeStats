@@ -50,7 +50,7 @@ jobs:
       - name: Upload release asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./intellij-idea/app/build/distributions/*
+        run: gh release upload ${{ github.event.release.tag_name }} ./intellij-plugin/app/build/distributions/*
 
       - name: Create pull request
         if: ${{ steps.properties.outputs.changelog != '' }}
