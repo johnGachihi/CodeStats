@@ -2,7 +2,7 @@ import org.jetbrains.changelog.markdownToHTML
 
 plugins {
     kotlin("jvm") version "1.7.10"
-    id("org.jetbrains.intellij") version "1.7.0"
+    id("org.jetbrains.intellij") version "1.9.0"
     id("org.jetbrains.changelog") version "1.3.1"
     id("org.jetbrains.qodana") version "0.1.13"
 }
