@@ -34,7 +34,7 @@ jobs:
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
           echo "::set-output name=changelog::$CHANGELOG"
 
-      - name: Patch Changelog
+      - name: Patch changelog
         if: ${{ steps.properties.outputs.changelog != '' }}
         env:
           CHANGELOG: ${{ steps.properties.outputs.changelog }}
