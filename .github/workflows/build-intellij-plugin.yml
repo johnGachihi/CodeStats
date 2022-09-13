@@ -2,7 +2,7 @@ name: build-intellij-plugin
 
 on:
   push:
-    branches: [ ci ]
+    branches: [ main ]
     paths:
       - '.github/workflows/build-intellij-plugin.yml'
       - 'intellij-plugin/**'
