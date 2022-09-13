@@ -39,6 +39,7 @@ jobs:
         env:
           CHANGELOG: ${{ steps.properties.outputs.changelog }}
         run: |
+          cd intellij-plugin
           ./gradlew patchChangelog --release-note="$CHANGELOG"
 
       - name: Publish plugin
