@@ -16,6 +16,10 @@ repositories {
     mavenCentral()
 }
 
+dependencies {
+    implementation("me.johngachihi.codestats.core:lib")
+}
+
 intellij {
     pluginName.set(properties("pluginName"))
     version.set(properties("platformVersion"))

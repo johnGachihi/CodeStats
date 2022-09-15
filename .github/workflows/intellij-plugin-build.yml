@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/intellij-plugin-build.yml'
       - 'intellij-plugin/**'
+      - 'core/**'
 
 jobs:
   build:

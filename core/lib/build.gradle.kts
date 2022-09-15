@@ -5,6 +5,8 @@ plugins {
 
 group = "me.johngachihi.codestats.core"
 
+java.targetCompatibility = JavaVersion.VERSION_11
+
 dependencies {
     implementation(kotlin("stdlib"))
 }
