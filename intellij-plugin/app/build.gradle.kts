@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.intellij") version "1.9.0"
     id("org.jetbrains.changelog") version "1.3.1"
     id("org.jetbrains.qodana") version "0.1.13"
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -18,6 +19,12 @@ repositories {
 
 dependencies {
     implementation("me.johngachihi.codestats.core:lib")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation("org.assertj:assertj-core:3.23.1")
 }
 
 intellij {
@@ -106,4 +113,8 @@ tasks {
     buildSearchableOptions {
         enabled = false
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

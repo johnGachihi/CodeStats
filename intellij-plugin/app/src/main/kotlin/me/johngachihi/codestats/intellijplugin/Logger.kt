@@ -1,35 +1,43 @@
 package me.johngachihi.codestats.intellijplugin
 
 import com.intellij.openapi.Disposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.future.await
-import kotlinx.coroutines.launch
+import com.intellij.openapi.components.Service
+import kotlinx.coroutines.*
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 import me.johngachihi.codestats.core.CodingEvent
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
+import java.util.concurrent.ConcurrentLinkedDeque
 
 interface Logger : Disposable {
-    fun log(codingEvent: CodingEvent)
+    fun logAsync(codingEvent: CodingEvent): Deferred<Unit>
 }
 
-class RemoteLogger : Logger {
-    // Inject in constructor?
-    private val client = HttpClient.newHttpClient()
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+@Service
+class RemoteLogger(
+    private val apiClient: ApiClient = DefaultApiClient(
+        // TODO: Externalize
+        "https://little-silence-2856.fly.dev"
+    ),
+    private val burstSize: Int = 10
+) : Logger {
+    // Look into using SupervisorJob
+    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val eventsBuffer = ConcurrentLinkedDeque<CodingEvent>()
 
-    private val eventsBuffer: Nothing = TODO()
+    override fun logAsync(codingEvent: CodingEvent): Deferred<Unit> {
+        eventsBuffer.add(codingEvent)
 
-    override fun log(codingEvent: CodingEvent) {
-        coroutineScope.launch {
-            val request = HttpRequest.newBuilder()
-                .uri(URI.create("https://johngachihi.me/adlfj"))
-                .build()
+        if (eventsBuffer.size < burstSize)
+            return CompletableDeferred<Unit>().apply { complete(Unit) }
 
-            client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).await()
+        return coroutineScope.async {
+            val serializedCodingEvent = Json.encodeToString(
+                ListSerializer(CodingEventJsonSerializer),
+                eventsBuffer.toList()
+            )
+            eventsBuffer.clear()
+
+            apiClient.sendRequest(path = "/coding-event", jsonBody = serializedCodingEvent)
         }
     }
 

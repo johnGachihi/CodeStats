@@ -1,16 +1,17 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.johngachihi.codestats</id>
+    <id>me.johngachihi.codestats.intellijplugin</id>
     <name>CodeStats</name>
     <vendor>johngachihi</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-
+        <projectService serviceImplementation="me.johngachihi.codestats.intellijplugin.RemoteLogger"/>
     </extensions>
 
     <applicationListeners>
-
+        <listener class="me.johngachihi.codestats.intellijplugin.EditorTypingActionListener"
+                  topic="com.intellij.openapi.actionSystem.ex.AnActionListener" />
     </applicationListeners>
 </idea-plugin>
