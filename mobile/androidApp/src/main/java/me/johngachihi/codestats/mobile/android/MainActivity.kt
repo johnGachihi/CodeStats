@@ -3,44 +3,52 @@ package me.johngachihi.codestats.mobile.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.johngachihi.codestats.mobile.Greeting
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun MyApplicationTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
-    val colors = if (darkTheme) {
-        darkColors(
-            primary = Color(0xFFBB86FC),
-            primaryVariant = Color(0xFF3700B3),
-            secondary = Color(0xFF03DAC5)
-        )
-    } else {
-        lightColors(
-            primary = Color(0xFF6200EE),
-            primaryVariant = Color(0xFF3700B3),
-            secondary = Color(0xFF03DAC5)
-        )
-    }
+fun AppTheme(content: @Composable () -> Unit) {
+    val colors = darkColors(
+        primary = Color(0xFF52DEE5),
+        primaryVariant = Color(0xFF44B4B9),
+        background = Color(0xFF00241B),
+        surface = Color(0xFF00241B)
+    )
+
+    val splineSansMono = FontFamily(
+        Font(R.font.spline_sans_mono_regular),
+        Font(R.font.spline_sans_mono_medium, FontWeight.Medium)
+    )
+
     val typography = Typography(
         body1 = TextStyle(
             fontFamily = FontFamily.Default,
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp
+        ),
+        h6 = TextStyle(
+            fontFamily = splineSansMono,
+            fontWeight = FontWeight.Black,
+            fontSize = 20.sp,
+            letterSpacing = 0.15.sp
         )
     )
     val shapes = Shapes(
@@ -48,6 +56,12 @@ fun MyApplicationTheme(
         medium = RoundedCornerShape(4.dp),
         large = RoundedCornerShape(0.dp)
     )
+
+    val systemUIController = rememberSystemUiController()
+    DisposableEffect(systemUIController) {
+        systemUIController.setSystemBarsColor(color = colors.background)
+        onDispose {}
+    }
 
     MaterialTheme(
         colors = colors,
@@ -60,28 +74,41 @@ fun MyApplicationTheme(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContent {
-            MyApplicationTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting(Greeting().greeting())
-                }
-            }
+            AppTheme { Root() }
         }
     }
 }
 
 @Composable
-fun Greeting(text: String) {
-    Text(text = text)
+fun Root() {
+    val navController = rememberNavController()
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text("Codestats") },
+                elevation = 0.dp,
+                contentColor = MaterialTheme.colors.primary
+            )
+        }
+    ) { contentPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(contentPadding)
+        ) {
+            composable("home") { HomeScreen() }
+        }
+    }
 }
 
 @Preview
 @Composable
-fun DefaultPreview() {
-    MyApplicationTheme {
-        Greeting("Hello, Android!")
+fun PreviewRoot() {
+    AppTheme {
+        Root()
     }
 }

@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "me.johngachihi.codestats.mobile.android"
-    compileSdk = 32
+    compileSdk = 33
     defaultConfig {
         applicationId = "me.johngachihi.codestats.mobile.android"
         minSdk = 21
@@ -39,4 +39,8 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.2.1")
     implementation("androidx.compose.material:material:1.2.1")
     implementation("androidx.activity:activity-compose:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("androidx.navigation:navigation-compose:2.5.2")
+    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.26.5-rc")
 }
