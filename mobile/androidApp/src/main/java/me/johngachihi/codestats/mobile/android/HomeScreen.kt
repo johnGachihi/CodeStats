@@ -1,11 +1,14 @@
 package me.johngachihi.codestats.mobile.android
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -57,13 +60,38 @@ fun HomeScreen() {
     }
 }
 
+enum class AnimatedBarsProgress { START, END }
+
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun HoursOfDayBarChart(
     barColor: Color = MaterialTheme.colors.primary,
-    axesColor: Color = Color.Gray
+    axesColor: Color = Color.Gray,
+    axesLabelStyle: TextStyle = TextStyle(color = axesColor, fontSize = 12.sp)
 ) {
     val textMeasurer = rememberTextMeasurer()
+
+    val currentState = remember {
+        MutableTransitionState(AnimatedBarsProgress.START).apply {
+            targetState = AnimatedBarsProgress.END
+        }
+    }
+    val transition = updateTransition(currentState, label = "")
+    val visibleHeightPortion by transition.animateFloat(label = "",
+        transitionSpec = {
+            tween(
+                delayMillis = 500,
+                durationMillis = 300,
+                easing = CubicBezierEasing(0f, 0.75f, 0.35f, 0.85f)
+            )
+        }
+    ) { progress ->
+        if (progress == AnimatedBarsProgress.START) {
+            0f
+        } else {
+            1f
+        }
+    }
 
     Canvas(
         modifier = Modifier
@@ -88,8 +116,6 @@ fun HoursOfDayBarChart(
             bottomRight = xAxisLabelRect.topRight
         )
 
-        val axesLabelStyle = TextStyle(color = axesColor, fontSize = 12.sp)
-
         val xAxis = Line(start = graphRect.bottomLeft, end = graphRect.bottomRight)
 
         // x axis line
@@ -100,7 +126,7 @@ fun HoursOfDayBarChart(
             strokeWidth = 4f
         )
 
-        // x axis labels
+        // x axis labelling
         val labels = listOf("0", "4", "8", "12", "16", "20", "24")
         val spaceBetweenLabels = graphRect.width / (labels.size - 1)
 
@@ -118,7 +144,7 @@ fun HoursOfDayBarChart(
             drawText(textLayoutResult = labelLayoutResult, topLeft = topLeft)
         }
 
-        // y-axis label
+        // y-axis labelling
         val yAxisLabelLayoutResult = textMeasurer.measure(
             text = AnnotatedString("90,000"),
             style = TextStyle(color = axesColor, fontSize = 12.sp),
@@ -131,17 +157,19 @@ fun HoursOfDayBarChart(
 
         // Bars
         val numOfBars = 48
-        val barSpacing = 2.dp.toPx()
+        val barSpacing = 2.dp.toPx() // TODO: Make constant
         val barWidth = (graphRect.width - (barSpacing * (numOfBars - 1))) / (numOfBars)
 
         for (i in 0 until numOfBars) {
             val xOffset = i * (barWidth + barSpacing) + barWidth / 2
-            val tempYTop =
-                graphRect.height / 2 - (graphRect.height / 2) * sin(i.toFloat() / 3)
+            val barHeight = visibleHeightPortion *
+                    (graphRect.height / 2 - (graphRect.height / 2) * sin(i.toFloat() / 3))
+            val barTop = graphRect.height - barHeight
+
             drawLine(
                 strokeWidth = barWidth,
                 start = Offset(x = xOffset, y = graphRect.bottom),
-                end = Offset(x = xOffset, y = tempYTop),
+                end = Offset(x = xOffset, y = barTop),
                 color = barColor
             )
         }
