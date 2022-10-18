@@ -11,18 +11,28 @@ class CodingStatsService {
     @Autowired
     private lateinit var codingEventRepo: CodingEventRepository
 
+    val startOfToday: Instant
+        get() = Instant.now().truncatedTo(ChronoUnit.DAYS)
+
+    val startOfTomorrow: Instant
+        get() = startOfToday.plus(1, ChronoUnit.DAYS)
+
     suspend fun computeStats() = CodingStats(
-        typedCharsToday = getCountOfCharsTypedToday()
+        typedCharsToday = fetchTypedCharCountToday(),
+        typedCharsDistributionToday = fetchTypedCharEventDistributionToday()
     )
 
-    private suspend fun getCountOfCharsTypedToday(): Int {
-        val startOfToday = Instant.now().truncatedTo(ChronoUnit.DAYS)
-        val startOfTomorrow = startOfToday.plus(1, ChronoUnit.DAYS)
-
-        return codingEventRepo.countEventsFiredBetween(
+    private suspend fun fetchTypedCharCountToday(): Int =
+        codingEventRepo.countEventsFiredBetween(
             type = CodingEventType.CHAR_TYPED,
             from = startOfToday,
             toExclusive = startOfTomorrow
         )
-    }
+
+    private suspend fun fetchTypedCharEventDistributionToday() =
+        codingEventRepo.getEventDistributionBetween(
+            type = CodingEventType.CHAR_TYPED,
+            from = startOfToday,
+            toExclusive = startOfTomorrow
+        )
 }
