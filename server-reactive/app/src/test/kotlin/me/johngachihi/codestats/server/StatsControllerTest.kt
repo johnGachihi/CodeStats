@@ -15,10 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.reactive.server.WebTestClient
-import java.time.Duration
 
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -39,26 +37,17 @@ internal class StatsControllerTest {
         now = Instant.now()
     }
 
-    val startOfToday
-        get() = now.truncatedTo(ChronoUnit.DAYS)
-
-    val startOfTomorrow
-        get() = startOfToday + 24.hours
-
-    val justYesterday
-        get() = startOfToday - 1.nanoSecs
-
     @Test
     fun `stats endpoint returns the count for char-typed events fired today`() = runTest {
         codingEventRepository.saveAll(
             listOf(
-                createCharTypedEvent(firedAt = startOfToday),
-                createCharTypedEvent(firedAt = startOfToday + 12.hours),
-                createCharTypedEvent(firedAt = startOfToday + 24.hours - 1.nanoSecs),
+                makeCharTypedEvent(firedAt = startOfToday(now)),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 12.hours),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 24.hours - 1.nanoSecs),
 
                 // Not counted
-                createCharTypedEvent(firedAt = justYesterday),
-                CodingEventDataModel(CodingEventType.PASTE, "abc", firedAt = startOfToday)
+                makeCharTypedEvent(firedAt = justYesterday(now)),
+                CodingEventDataModel(CodingEventType.PASTE, "abc", firedAt = startOfToday(now))
             )
         ).collect()
 
@@ -78,18 +67,18 @@ internal class StatsControllerTest {
         codingEventRepository.saveAll(
             listOf(
                 // 0000 <= x < 0030
-                createCharTypedEvent(firedAt = startOfToday),
-                createCharTypedEvent(firedAt = startOfToday + 15.min),
-                createCharTypedEvent(firedAt = startOfToday + 30.min - 1.nanoSecs),
+                makeCharTypedEvent(firedAt = startOfToday(now)),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 15.min),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 30.min - 1.nanoSecs),
                 // 0030 <= x < 0100
-                createCharTypedEvent(firedAt = startOfToday + 30.min),
-                createCharTypedEvent(firedAt = startOfToday + 1.hours - 1.nanoSecs),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 30.min),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 1.hours - 1.nanoSecs),
                 // 1200 <= x < 1230
-                createCharTypedEvent(firedAt = startOfToday + 12.hours),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 12.hours),
                 // 2330 <= x < 2400
-                createCharTypedEvent(firedAt = startOfToday + 23.hours + 45.min),
+                makeCharTypedEvent(firedAt = startOfToday(now) + 23.hours + 45.min),
                 // x > 2400 (Not included)
-                createCharTypedEvent(firedAt = startOfTomorrow)
+                makeCharTypedEvent(firedAt = startOfTomorrow(now))
             )
         ).collect()
 
@@ -108,22 +97,4 @@ internal class StatsControllerTest {
                 )
             }
     }
-
-    private val Int.hours
-        get() = Duration.ofHours(this.toLong())
-
-    private val Int.min
-        get() = Duration.ofMinutes(this.toLong())
-
-    private val Int.nanoSecs
-        get() = Duration.ofNanos(this.toLong())
-
-    private fun createCharTypedEvent(
-        payload: Char = 'a',
-        firedAt: Instant = Instant.now()
-    ) = CodingEventDataModel(
-        type = CodingEventType.CHAR_TYPED,
-        payload = payload.toString(),
-        firedAt = firedAt
-    )
 }
