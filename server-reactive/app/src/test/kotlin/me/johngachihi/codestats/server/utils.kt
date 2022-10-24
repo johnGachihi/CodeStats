@@ -3,6 +3,8 @@ package me.johngachihi.codestats.server
 import me.johngachihi.codestats.core.CodingEventType
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 
 fun makeCharTypedEvent(
@@ -34,6 +36,9 @@ val Int.min: Duration
 
 val Int.nanoSecs: Duration
     get() = Duration.ofNanos(this.toLong())
+
+val LocalDate.startOfDay: Instant
+    get() = atStartOfDay().toInstant(ZoneOffset.UTC)
 
 fun startOfToday(now: Instant): Instant = now.truncatedTo(ChronoUnit.DAYS)
 

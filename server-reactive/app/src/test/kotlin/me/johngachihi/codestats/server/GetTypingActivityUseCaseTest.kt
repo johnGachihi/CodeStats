@@ -36,9 +36,6 @@ internal class GetTypingActivityUseCaseTest {
         aDay = LocalDate.now()
     }
 
-    private val LocalDate.startOfDay
-        get() = atStartOfDay().toInstant(ZoneOffset.UTC)
-
     @Test
     fun `gets only typing activity`() = runTest {
         mongoTemplate.insertAll(
@@ -48,7 +45,7 @@ internal class GetTypingActivityUseCaseTest {
             )
         ).asFlow().collect()
 
-        val activity = GetTypingActivityUseCase(codingActivityRepository)
+        val activity = DefaultGetTypingActivityUseCase(codingActivityRepository)
             .invoke(day = aDay, period = Period.Day)
             .toList()
 
@@ -70,7 +67,7 @@ internal class GetTypingActivityUseCaseTest {
             )
         ).asFlow().collect()
 
-        val activity = GetTypingActivityUseCase(codingActivityRepository)
+        val activity = DefaultGetTypingActivityUseCase(codingActivityRepository)
             .invoke(day = aDay, period = Period.Day)
             .toList()
 
@@ -91,7 +88,7 @@ internal class GetTypingActivityUseCaseTest {
                 )
             ).asFlow().collect()
 
-            val activity = GetTypingActivityUseCase(codingActivityRepository)
+            val activity = DefaultGetTypingActivityUseCase(codingActivityRepository)
                 .invoke(day = aDay, period = Period.Week)
                 .toList()
 
@@ -111,9 +108,8 @@ internal class GetTypingActivityUseCaseTest {
                     makeCharTypedEvent(payload = 'n', firedAt = startOfNextMonth)
                 ),
             ).asFlow().collect()
-
-            val getTypingActivity = GetTypingActivityUseCase(codingActivityRepository)
-            val activity = GetTypingActivityUseCase(codingActivityRepository)
+            
+            val activity = DefaultGetTypingActivityUseCase(codingActivityRepository)
                 .invoke(day = aDay, period = Period.Month)
                 .toList()
 

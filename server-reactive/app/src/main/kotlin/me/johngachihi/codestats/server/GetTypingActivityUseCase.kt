@@ -11,11 +11,15 @@ import java.time.temporal.TemporalAdjusters.*
 
 enum class Period { Day, Week, Month }
 
+interface GetTypingActivityUseCase {
+    operator fun invoke(day: LocalDate, period: Period): Flow<CodingEventDataModel>
+}
+
 @Service
-class GetTypingActivityUseCase(
+class DefaultGetTypingActivityUseCase(
     @Autowired val codingActivityRepository: CodingActivityRepository
-) {
-    operator fun invoke(day: LocalDate, period: Period): Flow<CodingEventDataModel> {
+) : GetTypingActivityUseCase {
+    override operator fun invoke(day: LocalDate, period: Period): Flow<CodingEventDataModel> {
         val from = when (period) {
             Period.Day -> day
             Period.Week -> day.with(previousOrSame(MONDAY))
