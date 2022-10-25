@@ -47,3 +47,13 @@ tasks.withType<Test> {
 tasks.named<BootBuildImage>("bootBuildImage") {
     imageName = "codestats-server"
 }
+
+kotlin {
+    sourceSets {
+        all {
+            languageSettings.apply {
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+        }
+    }
+}

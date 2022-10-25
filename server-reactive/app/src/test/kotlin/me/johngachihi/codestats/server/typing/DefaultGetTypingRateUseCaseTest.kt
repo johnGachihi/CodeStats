@@ -1,9 +1,7 @@
-package me.johngachihi.codestats.server
+package me.johngachihi.codestats.server.typing
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import me.johngachihi.codestats.server.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -11,14 +9,13 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
-internal class GetTypingRateUseCaseTest {
+internal class DefaultGetTypingRateUseCaseTest {
     @Test
     fun `calls GetTypingActivityUseCase appropriately`() = runTest {
         val aDay = LocalDate.now()
         val mockGetTypingActivity = MockGetTypingActivityUseCase()
 
-        val getTypingRate = GetTypingRateUseCase(mockGetTypingActivity)
+        val getTypingRate = DefaultGetTypingRateUseCase(mockGetTypingActivity)
         getTypingRate(forDay = aDay, period = Period.Day)
         getTypingRate(forDay = aDay.plusDays(1), period = Period.Week)
         getTypingRate(forDay = aDay.plusDays(2), period = Period.Month)
@@ -49,7 +46,7 @@ internal class GetTypingRateUseCaseTest {
             )
             val whateverPeriod = Period.Day
 
-            val typingRate = GetTypingRateUseCase(mockGetTypingActivity)
+            val typingRate = DefaultGetTypingRateUseCase(mockGetTypingActivity)
                 .invoke(forDay = aDay, period = whateverPeriod) // Params don't matter
 
             assertThat(typingRate).containsExactly(
@@ -61,20 +58,3 @@ internal class GetTypingRateUseCaseTest {
         }
 }
 
-class MockGetTypingActivityUseCase(
-    private vararg val returning: CodingEventDataModel
-) : GetTypingActivityUseCase {
-
-    data class Params(val day: LocalDate, val period: Period)
-
-    private val _calls = mutableListOf<Params>()
-    val calls: List<Params> = _calls
-
-    override fun invoke(
-        day: LocalDate,
-        period: Period
-    ): Flow<CodingEventDataModel> {
-        _calls.add(Params(day, period))
-        return flowOf(*returning)
-    }
-}

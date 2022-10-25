@@ -1,11 +1,11 @@
-package me.johngachihi.codestats.server
+package me.johngachihi.codestats.server.typing
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.test.runTest
 import me.johngachihi.codestats.core.CodingEventType
+import me.johngachihi.codestats.server.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,12 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.test.annotation.DirtiesContext
-import java.time.DayOfWeek.*
+import java.time.DayOfWeek.MONDAY
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.time.temporal.TemporalAdjusters.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @DataMongoTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 internal class GetTypingActivityUseCaseTest {
@@ -108,7 +106,7 @@ internal class GetTypingActivityUseCaseTest {
                     makeCharTypedEvent(payload = 'n', firedAt = startOfNextMonth)
                 ),
             ).asFlow().collect()
-            
+
             val activity = DefaultGetTypingActivityUseCase(codingActivityRepository)
                 .invoke(day = aDay, period = Period.Month)
                 .toList()

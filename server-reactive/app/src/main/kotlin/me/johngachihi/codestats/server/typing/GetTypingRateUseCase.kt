@@ -1,4 +1,4 @@
-package me.johngachihi.codestats.server
+package me.johngachihi.codestats.server.typing
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -9,12 +9,16 @@ import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjuster
 
+interface GetTypingRateUseCase {
+    suspend operator fun invoke(forDay: LocalDate, period: Period): List<TypingRateSample>
+}
+
 @Service
-class GetTypingRateUseCase(
+class DefaultGetTypingRateUseCase(
     @Autowired
     private val getTypingActivity: GetTypingActivityUseCase
-) {
-    suspend operator fun invoke(forDay: LocalDate, period: Period): List<TypingRateSample> {
+) : GetTypingRateUseCase {
+    override suspend operator fun invoke(forDay: LocalDate, period: Period): List<TypingRateSample> {
         val typingActivity = getTypingActivity(forDay, period)
 
         val typingRateBuf = mutableMapOf<LocalDateTime, TypingRateSample>()

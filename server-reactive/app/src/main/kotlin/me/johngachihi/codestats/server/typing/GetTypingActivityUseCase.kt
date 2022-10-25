@@ -1,7 +1,9 @@
-package me.johngachihi.codestats.server
+package me.johngachihi.codestats.server.typing
 
 import kotlinx.coroutines.flow.Flow
 import me.johngachihi.codestats.core.CodingEventType
+import me.johngachihi.codestats.server.CodingActivityRepository
+import me.johngachihi.codestats.server.CodingEventDataModel
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek.MONDAY
