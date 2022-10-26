@@ -1,4 +1,4 @@
-package me.johngachihi.codestats.server.typing
+package me.johngachihi.codestats.core
 
 import java.time.LocalDateTime
 

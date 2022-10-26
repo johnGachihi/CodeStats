@@ -2,6 +2,7 @@ package me.johngachihi.codestats.server.typing
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
+import me.johngachihi.codestats.core.TypingStats
 import me.johngachihi.codestats.server.typing.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat

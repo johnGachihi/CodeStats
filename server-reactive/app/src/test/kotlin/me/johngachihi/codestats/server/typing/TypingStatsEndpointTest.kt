@@ -1,6 +1,8 @@
 package me.johngachihi.codestats.server.typing
 
 import kotlinx.coroutines.test.runTest
+import me.johngachihi.codestats.core.TypingRateSample
+import me.johngachihi.codestats.core.TypingStats
 import me.johngachihi.codestats.server.min
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
