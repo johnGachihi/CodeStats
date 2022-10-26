@@ -21,27 +21,23 @@ class DefaultGetTypingRateUseCase(
     override suspend operator fun invoke(forDay: LocalDate, period: Period): List<TypingRateSample> {
         val typingActivity = getTypingActivity(forDay, period)
 
-        val typingRateBuf = mutableMapOf<LocalDateTime, TypingRateSample>()
+        val typingRateBuf = mutableMapOf<LocalDateTime, Int>()
         typingActivity.collect {
             val firedAt = LocalDateTime.ofInstant(it.firedAt, ZoneOffset.UTC)
                 .truncatedTo(ChronoUnit.MINUTES)
             val timeBucketLowerLimit = firedAt.with(roundByHalfHour())
 
-            typingRateBuf.compute(timeBucketLowerLimit) { _, v ->
-                if (v == null) {
-                    TypingRateSample(count = 1, lowerLimit = timeBucketLowerLimit)
-                } else {
-                    TypingRateSample(count = v.count + 1, lowerLimit = v.lowerLimit)
-                }
-            }
+            typingRateBuf.merge(timeBucketLowerLimit, 1) { old, v -> old + v }
         }
 
-        return typingRateBuf.values.toList()
+        return typingRateBuf.map {
+            TypingRateSample(lowerLimit = it.key, count = it.value)
+        }
     }
 }
 
 data class TypingRateSample(
-    val count: Long,
+    val count: Int,
     val lowerLimit: LocalDateTime
 )
 
