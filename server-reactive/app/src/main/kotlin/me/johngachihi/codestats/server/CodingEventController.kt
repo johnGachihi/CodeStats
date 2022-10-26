@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class CodingEventController {
     @Autowired
-    private lateinit var codingEventRepo: CodingEventRepository
+    private lateinit var codingActivityRepo: CodingActivityRepository
 
     @PostMapping("/coding-event")
     suspend fun logCodingEvent(@RequestBody codingEvent: Flow<CodingEvent>) {
         codingEvent.collect {
-            codingEventRepo.save(it.toCodingEventDataModel())
+            codingActivityRepo.save(it.toCodingEventDataModel())
         }
     }
 }

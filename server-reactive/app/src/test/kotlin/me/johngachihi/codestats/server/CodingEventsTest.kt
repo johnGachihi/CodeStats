@@ -24,7 +24,7 @@ class CodingEventsTest {
     private lateinit var webClient: WebTestClient
 
     @Autowired
-    private lateinit var codingEventRepository: CodingEventRepository
+    private lateinit var codingActivityRepo: CodingActivityRepository
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
@@ -40,8 +40,8 @@ class CodingEventsTest {
             .exchange()
             .expectStatus().isOk
 
-        assertThat(codingEventRepository.count()).isEqualTo(1)
-        val storedEvent = codingEventRepository.findAll().first()
+        assertThat(codingActivityRepo.count()).isEqualTo(1)
+        val storedEvent = codingActivityRepo.findAll().first()
         assertThat(storedEvent)
             .hasFieldOrPropertyWithValue("type", codingEvent.type)
             .hasFieldOrPropertyWithValue("payload", codingEvent.payload)
