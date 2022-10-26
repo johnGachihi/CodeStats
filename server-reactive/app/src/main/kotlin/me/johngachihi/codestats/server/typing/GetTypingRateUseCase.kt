@@ -36,11 +36,6 @@ class DefaultGetTypingRateUseCase(
     }
 }
 
-data class TypingRateSample(
-    val count: Int,
-    val lowerLimit: LocalDateTime
-)
-
 private fun roundByHalfHour(): TemporalAdjuster = TemporalAdjuster { temporal ->
     if (temporal.get(ChronoField.MINUTE_OF_HOUR) < 30)
         temporal.with(ChronoField.MINUTE_OF_HOUR, 0L)
