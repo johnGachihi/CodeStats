@@ -17,4 +17,3 @@ includeBuild("../core")
 
 rootProject.name = "mobile"
 include(":androidApp")
-include(":shared")

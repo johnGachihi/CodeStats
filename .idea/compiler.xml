@@ -4,6 +4,7 @@
     <bytecodeTargetLevel>
       <module name="CodeStats.androidApp" target="17" />
       <module name="CodeStats.shared" target="17" />
+      <module name="mobile.shared" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
