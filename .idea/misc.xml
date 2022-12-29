@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="../../../../layout/compose-model-1663861936157.xml" value="0.8496503496503497" />
-      </map>
-    </option>
-  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/core" />
-    <file type="web" url="file://$PROJECT_DIR$/intellij-plugin" />
     <file type="web" url="file://$PROJECT_DIR$/mobile" />
-    <file type="web" url="file://$PROJECT_DIR$/server" />
-    <file type="web" url="file://$PROJECT_DIR$/server-reactive" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="17" project-jdk-type="JavaSDK" />
 </project>
