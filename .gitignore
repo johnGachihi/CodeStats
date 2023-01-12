@@ -73,3 +73,5 @@ fabric.properties
 
 ### Qodana
 **/.qodana
+
+.idea
