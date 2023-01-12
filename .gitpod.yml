@@ -16,6 +16,9 @@ tasks:
     command: |
       cd /workspace/CodeStats/server-reactive &&./gradlew bootRun
 
+  - name: build android
+    init: cd /workspace/CodeStats/mobile && ./gradlew build
+
 vscode:
   extensions:
     - vscjava.vscode-java-pack

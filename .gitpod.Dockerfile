@@ -22,3 +22,13 @@ RUN bash -c ". /home/gitpod/.sdkman/bin/sdkman-init.sh && \
 
 # Required for running intellij-plugin in an IDE within the vnc
 RUN sudo apt install libxtst6
+
+# Setup android sdk
+RUN sudo apt update -y && sudo apt install android-sdk -y && \
+    cd /usr/lib/android-sdk && \
+    sudo rm -r licenses && \
+    sudo wget -Olicenses.zip https://res.cloudinary.com/retech/raw/upload/v1672304116/Codestats/dev/licenses_fc6qmm.zip && \
+    sudo unzip licenses.zip && \
+    sudo rm licenses.zip && \
+    sudo chown -R gitpod /usr/lib/android-sdk && \
+    export ANDROID_HOME=/usr/lib/android-sdk
