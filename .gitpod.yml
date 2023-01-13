@@ -17,10 +17,14 @@ tasks:
       cd /workspace/CodeStats/server-reactive &&./gradlew bootRun
 
   - name: build android
-    init: cd /workspace/CodeStats/mobile && ./gradlew build
+    init: |
+      echo sdk.dir=/usr/local/bin/android-sdk > /workspace/CodeStats/mobile/local.properties
+      cd /workspace/CodeStats/mobile && ./gradlew build
+      
 
 jetbrains:
   intellij:
+    vmoptions: "-Xmx4g"
     prebuilds:
       version: stable
 

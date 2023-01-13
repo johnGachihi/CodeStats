@@ -24,11 +24,18 @@ RUN bash -c ". /home/gitpod/.sdkman/bin/sdkman-init.sh && \
 RUN sudo apt install libxtst6
 
 # Setup android sdk
-RUN sudo apt update -y && sudo apt install android-sdk -y && \
-    cd /usr/lib/android-sdk && \
-    sudo rm -r licenses && \
-    sudo wget -Olicenses.zip https://res.cloudinary.com/retech/raw/upload/v1672304116/Codestats/dev/licenses_fc6qmm.zip && \
-    sudo unzip licenses.zip && \
-    sudo rm licenses.zip && \
-    sudo chown -R gitpod /usr/lib/android-sdk && \
-    export ANDROID_HOME=/usr/lib/android-sdk
+ENV JAVA_HOME=/home/gitpod/.sdkman/candidates/java/current
+RUN sudo mkdir /usr/local/bin/android-sdk && cd /usr/local/bin/android-sdk && \
+    sudo chown root:gitpod . && sudo chmod g+rw . && \
+    wget -qOlicenses.zip https://res.cloudinary.com/retech/raw/upload/v1672304116/Codestats/dev/licenses_fc6qmm.zip && \
+    unzip -qq licenses.zip && \
+    rm licenses.zip && \
+    wget -qOcmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip && \
+    unzip -qq cmdtools.zip && \
+    cd cmdline-tools && \
+    mkdir latest && \
+    mv bin/ lib/ NOTICE.txt source.properties latest/ && \
+    cd latest/bin && \
+    ./sdkmanager --install "platforms;android-33" "build-tools;33.0.1"
+
+
