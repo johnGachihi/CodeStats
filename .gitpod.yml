@@ -19,6 +19,11 @@ tasks:
   - name: build android
     init: cd /workspace/CodeStats/mobile && ./gradlew build
 
+jetbrains:
+  intellij:
+    prebuilds:
+      version: stable
+
 vscode:
   extensions:
     - vscjava.vscode-java-pack
