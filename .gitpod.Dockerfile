@@ -15,10 +15,14 @@ RUN mkdir -p /tmp/mongodb && \
     sudo mkdir -p /data/db && \
     sudo chown gitpod:gitpod -R /data/db
 
-# Install java 17
+# Install java 17 and gradle 7.6
 RUN bash -c ". /home/gitpod/.sdkman/bin/sdkman-init.sh && \
     sdk install java 17.0.4-oracle && \
-    sdk default java 17.0.4-oracle"
+    sdk default java 17.0.4-oracle && \
+    sdk install gradle 7.6 && \
+    sdk default gradle 7.6"
+
+# Install gradle 7.6
 
 # Required for running intellij-plugin in an IDE within the vnc
 RUN sudo apt install libxtst6
