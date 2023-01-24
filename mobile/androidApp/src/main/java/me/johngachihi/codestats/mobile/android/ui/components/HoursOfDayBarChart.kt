@@ -1,4 +1,4 @@
-package me.johngachihi.codestats.mobile.android.components
+package me.johngachihi.codestats.mobile.android.ui.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -19,9 +19,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.johngachihi.codestats.mobile.android.AnimatedBarsProgress
-import me.johngachihi.codestats.mobile.android.AppTheme
-import me.johngachihi.codestats.mobile.android.Line
+import me.johngachihi.codestats.mobile.android.ui.AnimatedBarsProgress
+import me.johngachihi.codestats.mobile.android.ui.AppTheme
+import me.johngachihi.codestats.mobile.android.ui.Line
 import kotlin.math.ceil
 import kotlin.random.Random
 

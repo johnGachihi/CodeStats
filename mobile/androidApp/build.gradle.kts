@@ -32,6 +32,7 @@ android {
 }
 
 dependencies {
+    implementation("me.johngachihi.codestats.core:lib")
     implementation("androidx.compose.ui:ui:1.3.3")
     implementation("androidx.compose.ui:ui-tooling:1.3.3")
     implementation("androidx.compose.ui:ui-tooling-preview:1.3.3")
@@ -48,5 +49,23 @@ dependencies {
     val koinAndroidVersion = "3.3.1"
     implementation("io.insert-koin:koin-android:$koinAndroidVersion")
 
+    val ktorVersion = "2.2.2"
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
     testImplementation("junit:junit:4.13.2")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+}
+
+kotlin {
+    sourceSets {
+        all {
+            languageSettings.apply {
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+        }
+    }
 }

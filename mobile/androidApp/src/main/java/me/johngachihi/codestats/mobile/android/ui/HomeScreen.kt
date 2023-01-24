@@ -1,4 +1,4 @@
-package me.johngachihi.codestats.mobile.android
+package me.johngachihi.codestats.mobile.android.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import me.johngachihi.codestats.mobile.android.components.HoursOfDayBarChart
+import me.johngachihi.codestats.mobile.android.ui.components.HoursOfDayBarChart
 import kotlin.random.Random
 
 @Composable
