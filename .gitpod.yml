@@ -11,6 +11,7 @@ tasks:
 
   - name: server app
     init: |
+      export DATABASE_URL=mongodb://localhost:27017
       cd /workspace/CodeStats/server-reactive && ./gradlew build
       gp sync-done server-build
     command: |
