@@ -3,7 +3,6 @@ package me.johngachihi.codestats.server.typing
 import kotlinx.coroutines.test.runTest
 import me.johngachihi.codestats.core.TypingRateSample
 import me.johngachihi.codestats.core.TypingStats
-import me.johngachihi.codestats.server.min
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.verify
@@ -15,6 +14,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 
 @WebFluxTest(TypingStatsController::class)
 internal class TypingStatsEndpointTest {
@@ -53,8 +53,8 @@ internal class TypingStatsEndpointTest {
         val expectedTypingStats = TypingStats(
             count = 10,
             rate = listOf(
-                TypingRateSample(lowerLimit = LocalDateTime.now(), count = 1),
-                TypingRateSample(lowerLimit = LocalDateTime.now() + 30.min, count = 3),
+                TypingRateSample(lowerLimit = LocalDateTime.of(2022, Month.APRIL, 1, 12, 0), count = 1),
+                TypingRateSample(lowerLimit = LocalDateTime.of(2022, Month.APRIL, 2, 12, 0), count = 3),
             )
         )
         `when`(
