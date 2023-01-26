@@ -2,6 +2,7 @@ package me.johngachihi.codestats.server.typing
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.server.CodingEventDataModel
 import java.time.LocalDate
 

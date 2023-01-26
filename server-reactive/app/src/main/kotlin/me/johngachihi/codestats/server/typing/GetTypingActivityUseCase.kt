@@ -2,6 +2,7 @@ package me.johngachihi.codestats.server.typing
 
 import kotlinx.coroutines.flow.Flow
 import me.johngachihi.codestats.core.CodingEventType
+import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.server.CodingActivityRepository
 import me.johngachihi.codestats.server.CodingEventDataModel
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,8 +11,6 @@ import java.time.DayOfWeek.MONDAY
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.temporal.TemporalAdjusters.*
-
-enum class Period { Day, Week, Month }
 
 interface GetTypingActivityUseCase {
     operator fun invoke(day: LocalDate, period: Period): Flow<CodingEventDataModel>

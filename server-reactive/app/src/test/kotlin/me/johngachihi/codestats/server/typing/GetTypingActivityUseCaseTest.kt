@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.test.runTest
 import me.johngachihi.codestats.core.CodingEventType
+import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.server.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
