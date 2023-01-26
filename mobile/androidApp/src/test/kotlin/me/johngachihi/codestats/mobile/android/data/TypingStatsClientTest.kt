@@ -5,10 +5,12 @@ import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.core.TypingRateSample
 import me.johngachihi.codestats.core.TypingStats
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal class TypingStatsClientTest {
@@ -24,10 +26,13 @@ internal class TypingStatsClientTest {
         }
         val httpClient = createHttpClient(mockServer)
 
-        TypingStatsClient(httpClient).fetchTypingStats()
+        TypingStatsClient(httpClient).fetchTypingStats(
+            day = LocalDate.of(2023, 1, 1),
+            period = Period.Week
+        )
 
         mockServer.requestHistory.first().run {
-            assertEquals("${Constants.BaseUrl}/activity/typing", url.toString())
+            assertEquals("${Constants.BaseUrl}/activity/typing/2023-01-01/Week", url.toString())
             assertEquals(HttpMethod.Get, method)
         }
     }
@@ -42,7 +47,10 @@ internal class TypingStatsClientTest {
         }
         val httpClient = createHttpClient(mockServer)
 
-        TypingStatsClient(httpClient).fetchTypingStats().run {
+        TypingStatsClient(httpClient).fetchTypingStats(
+            day = LocalDate.now(),
+            period = Period.Week
+        ).run {
             assertEquals(12345, count)
             assertEquals(rate, emptyList<TypingRateSample>())
         }
