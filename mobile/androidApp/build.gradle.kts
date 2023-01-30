@@ -43,6 +43,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("androidx.core:core-splashscreen:1.0.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
     val koinVersion = "3.3.0"
     implementation("io.insert-koin:koin-core:$koinVersion")
@@ -54,6 +56,7 @@ dependencies {
     implementation("io.ktor:ktor-client-android:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")

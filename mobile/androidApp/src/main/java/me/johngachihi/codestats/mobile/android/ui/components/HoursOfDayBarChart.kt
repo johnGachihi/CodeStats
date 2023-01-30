@@ -4,6 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,9 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.johngachihi.codestats.mobile.android.ui.AnimatedBarsProgress
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
-import me.johngachihi.codestats.mobile.android.ui.Line
 import kotlin.math.ceil
 import kotlin.random.Random
 
@@ -185,6 +184,12 @@ fun HoursOfDayBarChart(
         )
         //////// End Remove
     }
+}
+
+enum class AnimatedBarsProgress { START, END }
+
+class Line(val start: Offset, val end: Offset) {
+    val midpoint: Offset = Offset(x = (end.x - start.x) / 2, y = (end.y - start.y) / 2)
 }
 
 @Preview

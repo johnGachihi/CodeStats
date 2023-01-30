@@ -4,6 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -20,4 +21,9 @@ fun createHttpClient(engine: HttpClientEngine) = HttpClient(engine) {
     expectSuccess = true
 
     addDefaultResponseValidation()
+
+    install(Logging) {
+        logger = Logger.SIMPLE
+        level = LogLevel.ALL
+    }
 }
