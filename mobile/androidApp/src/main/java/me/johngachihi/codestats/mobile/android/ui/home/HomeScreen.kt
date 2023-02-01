@@ -94,8 +94,8 @@ fun HomeScreen(
                 Spacer(Modifier.height(8.dp))
                 when (typingStats) {
                     is HomeViewModel.TypingStatsDataResult.Loading -> Text(
-                        "Loading...",
-                        style = MaterialTheme.typography.body1,
+                        "...",
+                        style = MaterialTheme.typography.h6,
                         color = MaterialTheme.colors.onBackground
                     )
                     is HomeViewModel.TypingStatsDataResult.Error -> Text(
@@ -117,24 +117,14 @@ fun HomeScreen(
         Card(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    "Typing rate",
+                    "Typing distribution",
                     style = MaterialTheme.typography.subtitle1
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(16.dp))
 
-                when (typingStats) {
-                    is HomeViewModel.TypingStatsDataResult.Loading -> Text(
-                        "Loading...",
-                        style = MaterialTheme.typography.body1,
-                        color = MaterialTheme.colors.onBackground
-                    )
-                    is HomeViewModel.TypingStatsDataResult.Error -> Text(
-                        "Error",
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.error
-                    )
-                    is HomeViewModel.TypingStatsDataResult.Success -> {
+                HoursOfDayBarChart(
+                    yValues = if (typingStats is HomeViewModel.TypingStatsDataResult.Success) {
                         val a: MutableList<Int> = MutableList(48) { 0 }
                         val rate = typingStats.typingStats.rate
                         for (sample in rate) {
@@ -142,74 +132,12 @@ fun HomeScreen(
                                 sample.lowerLimit.hour * 2 + if (sample.lowerLimit.minute == 0) 0 else 1
                             a[index] = sample.count
                         }
-                        HoursOfDayBarChart(yValues = a)
-                    }
-                }
-            }
-        }
-
-        Divider(Modifier.padding(vertical = 16.dp))
-
-        Card(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    "Type count",
-                    style = MaterialTheme.typography.subtitle1,
+                        a
+                    } else {
+                        MutableList(48) { 0 }
+                    },
+                    loading = typingStats is HomeViewModel.TypingStatsDataResult.Loading
                 )
-                Spacer(Modifier.height(8.dp))
-                when (typingStats) {
-                    is HomeViewModel.TypingStatsDataResult.Loading -> Text(
-                        "Loading...",
-                        style = MaterialTheme.typography.body1,
-                        color = MaterialTheme.colors.onBackground
-                    )
-                    is HomeViewModel.TypingStatsDataResult.Error -> Text(
-                        "Error",
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.error
-                    )
-                    else -> Text(
-                        (typingStats as HomeViewModel.TypingStatsDataResult.Success).typingStats.count.toString(),
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.primary
-                    )
-                }
-            }
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        Card(modifier = Modifier.fillMaxWidth(), elevation = 4.dp) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    "Typing rate",
-                    style = MaterialTheme.typography.subtitle1
-                )
-
-                Spacer(Modifier.height(8.dp))
-
-                when (typingStats) {
-                    is HomeViewModel.TypingStatsDataResult.Loading -> Text(
-                        "Loading...",
-                        style = MaterialTheme.typography.body1,
-                        color = MaterialTheme.colors.onBackground
-                    )
-                    is HomeViewModel.TypingStatsDataResult.Error -> Text(
-                        "Error",
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.error
-                    )
-                    is HomeViewModel.TypingStatsDataResult.Success -> {
-                        val a: MutableList<Int> = MutableList(48) { 0 }
-                        val rate = typingStats.typingStats.rate
-                        for (sample in rate) {
-                            val index =
-                                sample.lowerLimit.hour * 2 + if (sample.lowerLimit.minute == 0) 0 else 1
-                            a[index] = sample.count
-                        }
-                        HoursOfDayBarChart(yValues = a)
-                    }
-                }
             }
         }
     }

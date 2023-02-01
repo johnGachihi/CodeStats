@@ -4,24 +4,22 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.async
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import kotlin.math.ceil
+import kotlin.math.sin
 import kotlin.random.Random
 
 private val xAxisLabels = listOf("0", "4", "8", "12", "16", "20", "24")
@@ -34,48 +32,91 @@ fun HoursOfDayBarChart(
     barColor: Color = MaterialTheme.colors.primary,
     axesColor: Color = Color.Gray,
     axesLabelStyle: TextStyle = TextStyle(color = axesColor, fontSize = 12.sp),
+    loading: Boolean = false
 ) {
-    val maxYValue = remember(yValues) {
+    val (curYValues, setCurYValues) = remember { mutableStateOf(yValues) }
+
+    val maxYValue = remember(curYValues) {
         (ceil(yValues.max() / 100f) * 100).toInt()
     }
 
     val textMeasurer = rememberTextMeasurer()
 
-    val currentState = remember {
-        MutableTransitionState(AnimatedBarsProgress.START).apply {
-            targetState = AnimatedBarsProgress.END
-        }
-    }
-    val transition = updateTransition(currentState, label = "Appear Anim")
-    val sizePercentage by transition.animateFloat(
-        label = "Size Anim",
-        transitionSpec = {
-            tween(
-                delayMillis = 500,
+    val barHeightPercentage = remember { Animatable(0f) }
+    LaunchedEffect(yValues) {
+        barHeightPercentage.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(
                 durationMillis = 350,
                 easing = LinearOutSlowInEasing
             )
-        }
-    ) { progress ->
-        if (progress == AnimatedBarsProgress.START) {
-            0f
+        )
+        setCurYValues(yValues)
+        barHeightPercentage.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 350,
+                easing = LinearOutSlowInEasing,
+            )
+        )
+    }
+
+    val sineWavePhase = remember { Animatable(0f) }
+    val loadingBarHeightPercentage = remember { Animatable(1f) }
+    LaunchedEffect(loading) {
+        if (loading) {
+            async {
+                loadingBarHeightPercentage.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        delayMillis = 350, // wait for the bar to drop
+                        durationMillis = 350,
+                        easing = LinearOutSlowInEasing
+                    )
+                )
+            }
+            async {
+                sineWavePhase.animateTo(
+                    targetValue = -100f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(
+                            durationMillis = 55000,
+                            easing = LinearEasing
+                        ),
+                        repeatMode = RepeatMode.Reverse
+                    )
+                )
+            }
         } else {
-            1f
+            loadingBarHeightPercentage.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = 350,
+                    easing = LinearOutSlowInEasing
+                ),
+            )
+            sineWavePhase.snapTo(0f)
         }
     }
 
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(170.dp)
     ) {
         val canvasWidth = size.width
         val canvasHeight = size.height
 
         val xAxisYOffset = 24.dp.toPx()
 
+        val longestYAxisLabel = textMeasurer.measure(
+            text = AnnotatedString("100000"),
+            style = axesLabelStyle,
+            softWrap = false,
+            overflow = TextOverflow.Clip
+        )
         val yAxisLabelRect = Rect(
-            topLeft = Offset(x = canvasWidth - 56.dp.toPx(), y = 0f),
+            topLeft = Offset(x = canvasWidth - longestYAxisLabel.size.width, y = 0f),
             bottomRight = Offset(x = canvasWidth, y = canvasHeight - xAxisYOffset)
         )
         val xAxisLabelRect = Rect(
@@ -93,8 +134,8 @@ fun HoursOfDayBarChart(
         drawLine(
             start = xAxis.start,
             end = xAxis.end,
-            color = axesColor,
-            strokeWidth = 4f
+            color = axesColor.copy(alpha = 0.5f),
+            strokeWidth = 2f
         )
 
         // x axis labelling
@@ -127,9 +168,9 @@ fun HoursOfDayBarChart(
         val barSpacing = 2.dp.toPx()
         val barWidth = (graphRect.width - (barSpacing * (numOfBars - 1))) / (numOfBars)
 
-        yValues.forEachIndexed { idx, yValue ->
+        curYValues.forEachIndexed { idx, yValue ->
             val xOffset = idx * (barWidth + barSpacing) + barWidth / 2
-            val barHeight = sizePercentage * ((yValue * graphRect.height) / maxYValue)
+            val barHeight = barHeightPercentage.value * ((yValue * graphRect.height) / maxYValue)
             val barTop = graphRect.height - barHeight
 
             drawLine(
@@ -140,8 +181,43 @@ fun HoursOfDayBarChart(
             )
         }
 
-        ////////// REMOVE
-        val pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 10f))
+        // Loading Bars
+        repeat(48) {
+            val xOffset = it * (barWidth + barSpacing) + barWidth / 2
+            val amplitude = 0.2f
+            val angularFreq = 0.1f
+            val verticalOffset = 1f
+            val scale = graphRect.height / 4
+            val barHeight =
+                ((amplitude * sin(angularFreq * it + sineWavePhase.value) + verticalOffset) * scale * loadingBarHeightPercentage.value)
+            val barTop = (graphRect.height - barHeight)
+
+            drawLine(
+                strokeWidth = barWidth,
+                start = Offset(x = xOffset, y = graphRect.bottom),
+                end = Offset(x = xOffset, y = barTop),
+                color = axesColor.copy(alpha = 0.2f)
+            )
+        }
+
+        // top x-axis line
+        drawLine(
+            start = Offset(x = 0f, y = 0f),
+            end = Offset(x = graphRect.right, y = 0f),
+            color = axesColor.copy(alpha = 0.2f),
+            strokeWidth = 2f
+        )
+
+        // mid x-axis line
+        drawLine(
+            start = Offset(x = 0f, y = graphRect.height / 2),
+            end = Offset(x = graphRect.right, y = graphRect.height / 2),
+            color = axesColor.copy(alpha = 0.2f),
+            strokeWidth = 2f
+        )
+
+        ////////// For Debugging
+        /*val pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 10f))
 
         // Canvas left end line
         drawLine(
@@ -181,7 +257,7 @@ fun HoursOfDayBarChart(
             end = Offset(x = xAxis.end.x, y = canvasHeight),
             color = Color.White,
             pathEffect = pathEffect
-        )
+        )*/
         //////// End Remove
     }
 }
