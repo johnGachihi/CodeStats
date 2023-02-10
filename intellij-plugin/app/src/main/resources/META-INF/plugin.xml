@@ -8,6 +8,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="me.johngachihi.codestats.intellijplugin.RemoteLogger"/>
+        <statusBarWidgetFactory implementation="me.johngachihi.codestats.intellijplugin.CodestatsStatusBarWidgetFactory" />
+        <notificationGroup displayType="BALLOON" id="Codestats" />
     </extensions>
 
     <applicationListeners>
