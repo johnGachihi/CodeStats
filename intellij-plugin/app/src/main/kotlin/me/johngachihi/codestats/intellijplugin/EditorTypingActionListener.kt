@@ -14,10 +14,9 @@ import java.time.Instant
 
 
 internal class EditorTypingActionListener : AnActionListener {
-    private val logger = service<RemoteLogger>()
-
     @Suppress("DeferredResultUnused")
     override fun beforeEditorTyping(c: Char, dataContext: DataContext) {
+        val logger = service<RemoteLogger>()
         logger.logAsync(CodingEvent(CodingEventType.CHAR_TYPED, c.toString(), Instant.now()))
     }
 
@@ -25,6 +24,7 @@ internal class EditorTypingActionListener : AnActionListener {
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
         if (action is PasteAction) {
             val pastedText: String = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor)!!
+            val logger = service<RemoteLogger>()
             logger.logAsync(CodingEvent(CodingEventType.PASTE, pastedText, Instant.now()))
         }
     }
