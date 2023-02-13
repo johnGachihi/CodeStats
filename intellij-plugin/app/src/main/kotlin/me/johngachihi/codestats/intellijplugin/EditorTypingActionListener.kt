@@ -17,7 +17,10 @@ internal class EditorTypingActionListener : AnActionListener {
     @Suppress("DeferredResultUnused")
     override fun beforeEditorTyping(c: Char, dataContext: DataContext) {
         val logger = service<RemoteLogger>()
-        logger.logAsync(CodingEvent(CodingEventType.CHAR_TYPED, c.toString(), Instant.now()))
+        val prefs = service<CodestatsPreferences>()
+        logger.logAsync(
+            CodingEvent(CodingEventType.CHAR_TYPED, c.toString(), Instant.now(), prefs.username)
+        )
     }
 
     @Suppress("DeferredResultUnused")
@@ -25,7 +28,10 @@ internal class EditorTypingActionListener : AnActionListener {
         if (action is PasteAction) {
             val pastedText: String = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor)!!
             val logger = service<RemoteLogger>()
-            logger.logAsync(CodingEvent(CodingEventType.PASTE, pastedText, Instant.now()))
+            val prefs = service<CodestatsPreferences>()
+            logger.logAsync(
+                CodingEvent(CodingEventType.PASTE, pastedText, Instant.now(), prefs.username)
+            )
         }
     }
 }

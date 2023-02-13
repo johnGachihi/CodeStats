@@ -18,11 +18,12 @@ private data class CodingEventSurrogate(
     val type: CodingEventType,
     val payload: String,
     @Serializable(with = InstantSerializer::class)
-    val firedAt: Instant
+    val firedAt: Instant,
+    val username: String?
 )
 
-private fun CodingEvent.toCodingEventSurrogate() = CodingEventSurrogate(type, payload, firedAt)
-private fun CodingEventSurrogate.toCodingEvent() = CodingEvent(type, payload, firedAt)
+private fun CodingEvent.toCodingEventSurrogate() = CodingEventSurrogate(type, payload, firedAt, username)
+private fun CodingEventSurrogate.toCodingEvent() = CodingEvent(type, payload, firedAt, username)
 
 object CodingEventJsonSerializer : KSerializer<CodingEvent> {
     override val descriptor: SerialDescriptor
