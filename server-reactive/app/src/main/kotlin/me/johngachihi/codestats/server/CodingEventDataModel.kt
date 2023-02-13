@@ -13,16 +13,24 @@ data class CodingEventDataModel @PersistenceCreator constructor(
     val type: CodingEventType,
     val payload: String,
     val firedAt: Instant,
+    val username: String?
 ) {
     constructor(
         type: CodingEventType,
         payload: String,
-        firedAt: Instant
-    ) : this(null, type, payload, firedAt)
+        firedAt: Instant,
+    ) : this(null, type, payload, firedAt, null)
+
+    constructor(
+        type: CodingEventType,
+        payload: String,
+        firedAt: Instant,
+        username: String?
+    ) : this(null, type, payload, firedAt, username)
 }
 
 fun CodingEvent.toCodingEventDataModel(): CodingEventDataModel {
     return CodingEventDataModel(
-        type, payload, firedAt
+        type, payload, firedAt, username
     )
 }
