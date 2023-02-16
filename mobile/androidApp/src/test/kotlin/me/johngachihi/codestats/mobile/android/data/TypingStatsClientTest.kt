@@ -8,6 +8,9 @@ import kotlinx.serialization.json.Json
 import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.core.TypingRateSample
 import me.johngachihi.codestats.core.TypingStats
+import me.johngachihi.codestats.mobile.android.data.net.Constants
+import me.johngachihi.codestats.mobile.android.data.net.TypingStatsClient
+import me.johngachihi.codestats.mobile.android.data.net.createHttpClient
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate

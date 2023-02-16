@@ -1,4 +1,4 @@
-package me.johngachihi.codestats.mobile.android.data
+package me.johngachihi.codestats.mobile.android.data.net
 
 import io.ktor.client.*
 import io.ktor.client.call.*

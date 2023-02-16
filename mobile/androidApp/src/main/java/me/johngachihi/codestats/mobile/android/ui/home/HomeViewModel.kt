@@ -7,8 +7,8 @@ import io.ktor.client.engine.android.*
 import kotlinx.coroutines.launch
 import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.core.TypingStats
-import me.johngachihi.codestats.mobile.android.data.TypingStatsClient
-import me.johngachihi.codestats.mobile.android.data.createHttpClient
+import me.johngachihi.codestats.mobile.android.data.net.TypingStatsClient
+import me.johngachihi.codestats.mobile.android.data.net.createHttpClient
 import java.time.LocalDate
 
 class HomeViewModel : ViewModel() {

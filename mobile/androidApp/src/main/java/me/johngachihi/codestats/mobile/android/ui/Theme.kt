@@ -42,6 +42,12 @@ fun AppTheme(content: @Composable () -> Unit) {
             fontWeight = FontWeight.Black,
             fontSize = 20.sp,
             letterSpacing = 0.15.sp
+        ),
+        h2 = TextStyle(
+            fontFamily = splineSansMono,
+            fontWeight = FontWeight.Light,
+            fontSize = 60.sp,
+            letterSpacing = (-0.5).sp
         )
     )
     val shapes = Shapes(
