@@ -2,6 +2,7 @@ package me.johngachihi.codestats.mobile.android.data.net
 
 import io.ktor.client.*
 import io.ktor.client.engine.*
+import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -27,3 +28,5 @@ fun createHttpClient(engine: HttpClientEngine) = HttpClient(engine) {
         level = LogLevel.ALL
     }
 }
+
+val client = createHttpClient(Android.create())
