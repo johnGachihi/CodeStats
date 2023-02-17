@@ -8,7 +8,7 @@ android {
     compileSdk = 33
     defaultConfig {
         applicationId = "me.johngachihi.codestats.mobile.android"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
