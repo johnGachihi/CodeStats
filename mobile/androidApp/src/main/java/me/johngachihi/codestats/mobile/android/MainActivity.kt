@@ -42,6 +42,7 @@ fun Root() {
 
     when (isFirstUse) {
         is UiState.Loading -> Text(text = "Loading")
+        is UiState.Error -> Text(text = "Error")
         is UiState.Success -> {
             if ((isFirstUse as UiState.Success<Boolean>).data) {
                 FirstTimerApp()

@@ -8,13 +8,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
+import me.johngachihi.codestats.mobile.android.ui.UiState
 import me.johngachihi.codestats.mobile.android.ui.components.HoursOfDayBarChart
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -24,20 +28,11 @@ fun HomeScreen(
     setAppBarActions: (@Composable (RowScope.() -> Unit)) -> Unit = { },
     homeViewModel: HomeViewModel = viewModel()
 ) {
-    val (typingStats, setTypingStats) = remember { homeViewModel.typingStats }
-    val (day, setDay) = remember { homeViewModel.day }
+    val typingStats by remember { homeViewModel.typingStats }
+    val day by remember { homeViewModel.day }
 
     val formattedDay by remember(day) {
-        derivedStateOf {
-            if (day.compareTo(LocalDate.now()) == 0) "Today" else day.format(
-                DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy")
-            )
-        }
-    }
-
-    LaunchedEffect(day) {
-        setTypingStats(HomeViewModel.TypingStatsDataResult.Loading)
-        homeViewModel.refresh()
+        derivedStateOf { formatDate(day) }
     }
 
     setAppBarActions {
@@ -56,24 +51,20 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState())
     ) {
         Row(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = {
-                setDay(day.minusDays(1))
-            }) {
+            IconButton(onClick = { homeViewModel.decDay() }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowLeft,
                     contentDescription = "Previous"
                 )
             }
             Text(formattedDay, style = MaterialTheme.typography.body2)
-            IconButton(onClick = {
-                setDay(day.plusDays(1))
-            }) {
+            IconButton(onClick = { homeViewModel.incDay() }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "Next"
@@ -89,18 +80,18 @@ fun HomeScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 when (typingStats) {
-                    is HomeViewModel.TypingStatsDataResult.Loading -> Text(
+                    is UiState.Loading -> Text(
                         "...",
                         style = MaterialTheme.typography.h6,
                         color = MaterialTheme.colors.onBackground
                     )
-                    is HomeViewModel.TypingStatsDataResult.Error -> Text(
+                    is UiState.Error -> Text(
                         "Error",
                         style = MaterialTheme.typography.h6,
                         color = MaterialTheme.colors.error
                     )
                     else -> Text(
-                        (typingStats as HomeViewModel.TypingStatsDataResult.Success).typingStats.count.toString(),
+                        (typingStats as UiState.Success).data.count.toString(),
                         style = MaterialTheme.typography.h6,
                         color = MaterialTheme.colors.primary
                     )
@@ -119,24 +110,33 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(16.dp))
 
+                /*TODO: Simplify
+                Eg.
                 HoursOfDayBarChart(
-                    yValues = if (typingStats is HomeViewModel.TypingStatsDataResult.Success) {
-                        val a: MutableList<Int> = MutableList(48) { 0 }
-                        val rate = typingStats.typingStats.rate
-                        for (sample in rate) {
-                            val index =
-                                sample.lowerLimit.hour * 2 + if (sample.lowerLimit.minute == 0) 0 else 1
-                            a[index] = sample.count
-                        }
-                        a
-                    } else {
-                        MutableList(48) { 0 }
-                    },
-                    loading = typingStats is HomeViewModel.TypingStatsDataResult.Loading
-                )
+                    yValues = if (typingStats is UiState.Success) typingStats.data.rate else null,
+                    loading = typingStats is UiState.Loading,
+                    error = if (typingStats is UiState.Error) typingStats.error else null
+                )*/
+                when (typingStats) {
+                    is UiState.Success -> HoursOfDayBarChart(
+                        yValues = (typingStats as UiState.Success<UiTypingStats>).data.rate,
+                    )
+                    is UiState.Loading -> HoursOfDayBarChart(loading = true)
+                    // TODO: Add error state
+                    is UiState.Error -> HoursOfDayBarChart()
+                }
             }
         }
     }
+}
+
+fun formatDate(day: LocalDate): String {
+    return if (day.compareTo(LocalDate.now()) == 0)
+        "Today"
+    else
+        day.format(
+            DateTimeFormatter.ofPattern("EEE, dd MMM yyyy")
+        )
 }
 
 @Preview

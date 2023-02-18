@@ -25,6 +25,7 @@ import kotlin.random.Random
 private val xAxisLabels = listOf("0", "4", "8", "12", "16", "20", "24")
 private const val numOfBars = 48
 
+// TODO: Refactor
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun HoursOfDayBarChart(
@@ -37,6 +38,7 @@ fun HoursOfDayBarChart(
     val (curYValues, setCurYValues) = remember { mutableStateOf(yValues) }
 
     val maxYValue = remember(curYValues) {
+        // TODO: Should yValues be used be used beyond the statement above
         (ceil(yValues.max() / 100f) * 100).toInt()
     }
 
