@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import kotlin.math.ceil
 import kotlin.math.sin
@@ -25,81 +25,31 @@ import kotlin.random.Random
 private val xAxisLabels = listOf("0", "4", "8", "12", "16", "20", "24")
 private const val numOfBars = 48
 
-// TODO: Refactor
+private const val dataBarDropAnimDuration = 350
+
+typealias YValues = List<Int>
+
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun HoursOfDayBarChart(
-    yValues: List<Int> = List(48) { 0 },
+    yValues: YValues = List(numOfBars) { 0 },
     barColor: Color = MaterialTheme.colors.primary,
     axesColor: Color = Color.Gray,
     axesLabelStyle: TextStyle = TextStyle(color = axesColor, fontSize = 12.sp),
     loading: Boolean = false
 ) {
-    val (curYValues, setCurYValues) = remember { mutableStateOf(yValues) }
+    val (internalYValues, dataBarHeightPercentage) =
+        rememberChartUpdateAnimation(yValues, dropAnimDuration = dataBarDropAnimDuration)
 
-    val maxYValue = remember(curYValues) {
-        // TODO: Should yValues be used be used beyond the statement above
-        (ceil(yValues.max() / 100f) * 100).toInt()
+    val maxYValue = remember(internalYValues) {
+        // TODO: Why don't I use derivedState or should I?
+        (ceil(internalYValues.max() / 100f) * 100).toInt()
     }
 
     val textMeasurer = rememberTextMeasurer()
 
-    val barHeightPercentage = remember { Animatable(0f) }
-    LaunchedEffect(yValues) {
-        barHeightPercentage.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(
-                durationMillis = 350,
-                easing = LinearOutSlowInEasing
-            )
-        )
-        setCurYValues(yValues)
-        barHeightPercentage.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(
-                durationMillis = 350,
-                easing = LinearOutSlowInEasing,
-            )
-        )
-    }
-
-    val sineWavePhase = remember { Animatable(0f) }
-    val loadingBarHeightPercentage = remember { Animatable(1f) }
-    LaunchedEffect(loading) {
-        if (loading) {
-            async {
-                loadingBarHeightPercentage.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        delayMillis = 350, // wait for the bar to drop
-                        durationMillis = 350,
-                        easing = LinearOutSlowInEasing
-                    )
-                )
-            }
-            async {
-                sineWavePhase.animateTo(
-                    targetValue = -100f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(
-                            durationMillis = 55000,
-                            easing = LinearEasing
-                        ),
-                        repeatMode = RepeatMode.Reverse
-                    )
-                )
-            }
-        } else {
-            loadingBarHeightPercentage.animateTo(
-                targetValue = 0f,
-                animationSpec = tween(
-                    durationMillis = 350,
-                    easing = LinearOutSlowInEasing
-                ),
-            )
-            sineWavePhase.snapTo(0f)
-        }
-    }
+    val (loadingBarHeightPercentage, loadingBarSineWavePhase) =
+        rememberLoadingAnimation(loading = loading, riseDelay = dataBarDropAnimDuration)
 
     Canvas(
         modifier = Modifier
@@ -170,9 +120,10 @@ fun HoursOfDayBarChart(
         val barSpacing = 2.dp.toPx()
         val barWidth = (graphRect.width - (barSpacing * (numOfBars - 1))) / (numOfBars)
 
-        curYValues.forEachIndexed { idx, yValue ->
+        internalYValues.forEachIndexed { idx, yValue ->
             val xOffset = idx * (barWidth + barSpacing) + barWidth / 2
-            val barHeight = barHeightPercentage.value * ((yValue * graphRect.height) / maxYValue)
+            val barHeight =
+                dataBarHeightPercentage.value * ((yValue * graphRect.height) / maxYValue)
             val barTop = graphRect.height - barHeight
 
             drawLine(
@@ -184,14 +135,14 @@ fun HoursOfDayBarChart(
         }
 
         // Loading Bars
-        repeat(48) {
+        repeat(numOfBars) {
             val xOffset = it * (barWidth + barSpacing) + barWidth / 2
             val amplitude = 0.2f
             val angularFreq = 0.1f
             val verticalOffset = 1f
             val scale = graphRect.height / 4
             val barHeight =
-                ((amplitude * sin(angularFreq * it + sineWavePhase.value) + verticalOffset) * scale * loadingBarHeightPercentage.value)
+                ((amplitude * sin(angularFreq * it + loadingBarSineWavePhase.value) + verticalOffset) * scale * loadingBarHeightPercentage.value)
             val barTop = (graphRect.height - barHeight)
 
             drawLine(
@@ -264,7 +215,91 @@ fun HoursOfDayBarChart(
     }
 }
 
-enum class AnimatedBarsProgress { START, END }
+// TODO: Stop returning Pair. User of this composable may confuse
+//       between the two values. Use something with "useful" type-checking
+
+data class ChartUpdateAnimationState(
+    val internalYValues: List<Int>,
+    val dataBarHeightPercentage: Animatable<Float, AnimationVector1D>
+)
+
+@Composable
+private fun rememberChartUpdateAnimation(
+    yValues: YValues,
+    dropAnimDuration: Int
+): ChartUpdateAnimationState {
+    val (internalYValues, setInternalYValues) = remember { mutableStateOf(yValues) }
+    val dataBarHeightPercentage = remember { Animatable(0f) }
+
+    LaunchedEffect(yValues) {
+        dataBarHeightPercentage.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(
+                durationMillis = dropAnimDuration,
+                easing = LinearOutSlowInEasing
+            )
+        )
+        setInternalYValues(yValues)
+        dataBarHeightPercentage.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 350,
+                easing = LinearOutSlowInEasing,
+            )
+        )
+    }
+
+    return ChartUpdateAnimationState(internalYValues, dataBarHeightPercentage)
+}
+
+data class LoadingAnimationState(
+    val loadingBarHeightPercentage: Animatable<Float, AnimationVector1D>,
+    val loadingBarSineWavePhase: Animatable<Float, AnimationVector1D>
+)
+
+@Composable
+private fun rememberLoadingAnimation(loading: Boolean, riseDelay: Int): LoadingAnimationState {
+    val loadingBarSineWavePhase = remember { Animatable(0f) }
+    val loadingBarHeightPercentage = remember { Animatable(1f) }
+
+    LaunchedEffect(loading) {
+        if (loading) {
+            launch {
+                loadingBarHeightPercentage.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        delayMillis = riseDelay,
+                        durationMillis = 350,
+                        easing = LinearOutSlowInEasing
+                    )
+                )
+            }
+
+            loadingBarSineWavePhase.animateTo(
+                targetValue = -100f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(
+                        durationMillis = 55000,
+                        easing = LinearEasing
+                    ),
+                    repeatMode = RepeatMode.Reverse
+                )
+            )
+        } else {
+            loadingBarHeightPercentage.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = 350,
+                    easing = LinearOutSlowInEasing
+                ),
+            )
+            // TODO: Check why wave snaps backward before it lowers
+            loadingBarSineWavePhase.snapTo(0f)
+        }
+    }
+
+    return LoadingAnimationState(loadingBarHeightPercentage, loadingBarSineWavePhase)
+}
 
 class Line(val start: Offset, val end: Offset) {
     val midpoint: Offset = Offset(x = (end.x - start.x) / 2, y = (end.y - start.y) / 2)
