@@ -15,4 +15,6 @@ interface CodingActivityRepository : CoroutineCrudRepository<CodingEventDataMode
         from: Instant,
         toExclusive: Instant
     ): Flow<CodingEventDataModel>
+
+    suspend fun existsByUsername(username: String): Boolean
 }

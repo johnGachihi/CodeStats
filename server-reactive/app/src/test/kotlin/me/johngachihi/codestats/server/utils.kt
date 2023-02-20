@@ -9,20 +9,24 @@ import java.time.temporal.ChronoUnit
 
 fun makeCharTypedEvent(
     payload: Char = 'a',
-    firedAt: Instant = Instant.now()
+    firedAt: Instant = Instant.now(),
+    username: String? = null
 ) = CodingEventDataModel(
     type = CodingEventType.CHAR_TYPED,
     payload = payload.toString(),
-    firedAt = firedAt
+    firedAt = firedAt,
+    username = username
 )
 
 fun makePasteEvent(
     payload: String = "abc",
-    firedAt: Instant = Instant.now()
+    firedAt: Instant = Instant.now(),
+    username: String? = null
 ) = CodingEventDataModel(
     type = CodingEventType.PASTE,
     payload = payload,
-    firedAt = firedAt
+    firedAt = firedAt,
+    username = username
 )
 
 val Int.days: Duration
