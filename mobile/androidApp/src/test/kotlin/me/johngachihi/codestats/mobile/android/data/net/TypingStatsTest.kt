@@ -1,21 +1,17 @@
-package me.johngachihi.codestats.mobile.android.data
+package me.johngachihi.codestats.mobile.android.data.net
 
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.core.TypingRateSample
 import me.johngachihi.codestats.core.TypingStats
-import me.johngachihi.codestats.mobile.android.data.net.Constants
-import me.johngachihi.codestats.mobile.android.data.net.createHttpClient
-import me.johngachihi.codestats.mobile.android.data.net.fetchTypingStats
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Test
+import respondJson
 import java.time.LocalDate
 
-internal class TypingStatsClientTest {
+internal class TypingStatsTest {
     @Test
     fun `sends correct http request`() = runTest {
         val mockServer = MockEngine {
@@ -30,8 +26,11 @@ internal class TypingStatsClientTest {
         )
 
         mockServer.requestHistory.first().run {
-            assertEquals("${Constants.BaseUrl}/activity/typing/2021-01-01/Week", url.toString())
-            assertEquals(HttpMethod.Get, method)
+            Assert.assertEquals(
+                "${Constants.BaseUrl}/activity/typing/2021-01-01/Week",
+                url.toString()
+            )
+            Assert.assertEquals(HttpMethod.Get, method)
         }
     }
 
@@ -54,11 +53,6 @@ internal class TypingStatsClientTest {
             httpClient = httpClient
         )
 
-        assertEquals(expectedTypingStats, actualTypingStats)
+        Assert.assertEquals(expectedTypingStats, actualTypingStats)
     }
 }
-
-private inline fun <reified T> MockRequestHandleScope.respondJson(payload: T) = respond(
-    content = Json.encodeToString(payload),
-    headers = headersOf(HttpHeaders.ContentType, "application/json")
-)

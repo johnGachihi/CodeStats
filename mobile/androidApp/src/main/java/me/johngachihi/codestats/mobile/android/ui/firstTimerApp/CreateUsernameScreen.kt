@@ -1,63 +1,40 @@
-package me.johngachihi.codestats.mobile.android.ui
+package me.johngachihi.codestats.mobile.android.ui.firstTimerApp
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.launch
-import me.johngachihi.codestats.mobile.android.data.datastore.saveFirstUsePref
-import me.johngachihi.codestats.mobile.android.data.datastore.saveUsernamePref
-
-@Composable
-fun FirstTimerApp() {
-    val navController = rememberNavController()
-
-    Scaffold(modifier = Modifier.fillMaxSize()) { contentPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.CreateUsername.route,
-            modifier = Modifier.padding(contentPadding)
-        ) {
-            composable(Screen.CreateUsername.route) {
-                CreateUsernameScreen(navigateToEnterExistingUsernameScreen = {
-                    navController.navigate(Screen.EnterExistingUsername.route)
-                })
-            }
-
-            composable(Screen.EnterExistingUsername.route) {
-                EnterExistingUsernameScreen(navigateToCreateUsername = {
-                    navController.navigate(Screen.CreateUsername.route)
-                })
-            }
-        }
-    }
-}
-
-private sealed class Screen(val route: String) {
-    object CreateUsername : Screen("create-username")
-    object EnterExistingUsername : Screen("enter-existing-username")
-}
+import androidx.lifecycle.viewmodel.compose.viewModel
+import me.johngachihi.codestats.mobile.android.ui.AppTheme
+import me.johngachihi.codestats.mobile.android.ui.UiState
 
 @Composable
 fun CreateUsernameScreen(
     navigateToEnterExistingUsernameScreen: () -> Unit,
+    showSnackbar: suspend (String, String) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
+    vm: CreateUsernameScreenViewModel = viewModel()
 ) {
     val (usernameInput, setUsernameInput) = remember { mutableStateOf("") }
 
-    val scope = rememberCoroutineScope()
+    val isUsernameAvailable by remember { vm.isUsernameAvailable }
+
     val context = LocalContext.current
+
+    LaunchedEffect(isUsernameAvailable) {
+        if (isUsernameAvailable is UiState.Error) {
+            when (showSnackbar("Error experienced", "Retry")) {
+                SnackbarResult.ActionPerformed -> vm.onSubmit(usernameInput, context)
+                else -> {}
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -85,25 +62,45 @@ fun CreateUsernameScreen(
         Column {
             OutlinedTextField(
                 value = usernameInput,
-                onValueChange = { setUsernameInput(it) },
+                onValueChange = {
+                    setUsernameInput(it)
+                    vm.clearIsUsernameAvailableState()
+                },
                 label = { Text(text = "Username") },
+                isError = if (isUsernameAvailable is UiState.Success)
+                    !(isUsernameAvailable as UiState.Success<Boolean>).data
+                else
+                    false,
+                singleLine = true
             )
+
+            AnimatedVisibility(
+                visible = isUsernameAvailable is UiState.Success &&
+                        !(isUsernameAvailable as UiState.Success<Boolean>).data,
+            ) {
+                Text(
+                    text = "This one's taken. Try another.",
+                    style = MaterialTheme.typography.body2,
+                    color = MaterialTheme.colors.error,
+                    modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Button(
-                onClick = {
-                    scope.launch {
-                        launch { context.saveUsernamePref(usernameInput) }
-                        context.saveFirstUsePref(false)
-                    }
-                },
-                modifier = Modifier.align(Alignment.End)
+                onClick = { vm.onSubmit(usernameInput, context) },
+                modifier = Modifier.align(Alignment.End),
+                enabled = isUsernameAvailable !is UiState.Loading && usernameInput.isNotBlank()
             ) {
-                Text(text = "Ok")
+                if (isUsernameAvailable is UiState.Loading) {
+                    LinearProgressIndicator(modifier = Modifier.width(24.dp))
+                } else {
+                    Text(text = "Ok")
+                }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
             Row(modifier = Modifier.clickable { navigateToEnterExistingUsernameScreen() }) {
                 Text(
@@ -145,17 +142,5 @@ fun CreateUsernameScreen(
 fun CreateUsernameScreenPreview() {
     AppTheme {
         CreateUsernameScreen(navigateToEnterExistingUsernameScreen = {})
-    }
-}
-
-@Composable
-fun EnterExistingUsernameScreen(
-    navigateToCreateUsername: () -> Unit,
-) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Enter existing username")
-        Button(onClick = { navigateToCreateUsername() }) {
-            Text(text = "I don't have one")
-        }
     }
 }

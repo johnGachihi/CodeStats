@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import me.johngachihi.codestats.mobile.android.data.datastore.firstUsePref
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
-import me.johngachihi.codestats.mobile.android.ui.FirstTimerApp
+import me.johngachihi.codestats.mobile.android.ui.firstTimerApp.FirstTimerApp
 import me.johngachihi.codestats.mobile.android.ui.UiState
 import me.johngachihi.codestats.mobile.android.ui.home.HomeScreen
 
