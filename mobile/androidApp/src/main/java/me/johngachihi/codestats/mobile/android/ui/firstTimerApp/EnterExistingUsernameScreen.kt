@@ -1,6 +1,5 @@
 package me.johngachihi.codestats.mobile.android.ui.firstTimerApp
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -12,30 +11,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import me.johngachihi.codestats.mobile.android.ui.UiState
 
 @Composable
-fun CreateUsernameScreen(
-    navigateToEnterExistingUsernameScreen: () -> Unit,
-    showSnackbar: suspend (String, String) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
-    vm: CreateUsernameScreenViewModel = viewModel()
+fun EnterExistingUsernameScreen(
+    navigateToCreateUsername: () -> Unit,
+    vm: EnterExistingUsernameScreenViewModel = EnterExistingUsernameScreenViewModel()
 ) {
     val (usernameInput, setUsernameInput) = remember { mutableStateOf("") }
 
-    val isUsernameAvailable by remember { vm.isUsernameAvailable }
+    val saveUsernameState by remember { vm.saveUsernameState }
 
     val context = LocalContext.current
-
-    LaunchedEffect(isUsernameAvailable) {
-        if (isUsernameAvailable is UiState.Error) {
-            when (showSnackbar("Error experienced", "Retry")) {
-                SnackbarResult.ActionPerformed -> vm.onSubmit(usernameInput, context)
-                else -> {}
-            }
-        }
-    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -44,16 +32,17 @@ fun CreateUsernameScreen(
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
-            text = "Welcome",
+            text = "Welcome back",
             style = MaterialTheme.typography.h2,
             color = MaterialTheme.colors.primary,
             textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Create a username",
+            text = "Enter your username",
             style = MaterialTheme.typography.h6,
         )
 
@@ -62,38 +51,19 @@ fun CreateUsernameScreen(
         Column {
             OutlinedTextField(
                 value = usernameInput,
-                onValueChange = {
-                    setUsernameInput(it)
-                    vm.clearIsUsernameAvailableState()
-                },
+                onValueChange = { setUsernameInput(it) },
                 label = { Text(text = "Username") },
-                isError = if (isUsernameAvailable is UiState.Success)
-                    !(isUsernameAvailable as UiState.Success<Boolean>).data
-                else
-                    false,
                 singleLine = true
             )
-
-            AnimatedVisibility(
-                visible = isUsernameAvailable is UiState.Success &&
-                        !(isUsernameAvailable as UiState.Success<Boolean>).data,
-            ) {
-                Text(
-                    text = "This one's taken. Try another.",
-                    style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.error,
-                    modifier = Modifier.padding(top = 4.dp, start = 4.dp)
-                )
-            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Button(
-                onClick = { vm.onSubmit(usernameInput, context) },
+                onClick = { vm.setUsername(usernameInput, context) },
                 modifier = Modifier.align(Alignment.End),
-                enabled = isUsernameAvailable !is UiState.Loading && usernameInput.isNotBlank()
+                enabled = usernameInput.isNotEmpty()
             ) {
-                if (isUsernameAvailable is UiState.Loading) {
+                if (saveUsernameState is UiState.Loading) {
                     LinearProgressIndicator(modifier = Modifier.width(24.dp))
                 } else {
                     Text(text = "Ok")
@@ -102,15 +72,15 @@ fun CreateUsernameScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            Row(modifier = Modifier.clickable { navigateToEnterExistingUsernameScreen() }) {
+            Row(modifier = Modifier.clickable { navigateToCreateUsername() }) {
                 Text(
-                    text = "I have one already.",
+                    text = "Don't have a username?",
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
                 )
 
                 Text(
-                    text = "Set it",
+                    text = "Create one.",
                     style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier.padding(start = 2.dp)
@@ -139,8 +109,8 @@ fun CreateUsernameScreen(
 
 @Preview
 @Composable
-fun CreateUsernameScreenPreview() {
+fun EnterExistingUsernameScreenPreview() {
     AppTheme {
-        CreateUsernameScreen(navigateToEnterExistingUsernameScreen = {})
+        EnterExistingUsernameScreen(navigateToCreateUsername = {})
     }
 }

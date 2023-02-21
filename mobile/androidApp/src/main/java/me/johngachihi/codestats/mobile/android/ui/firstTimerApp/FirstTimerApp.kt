@@ -1,11 +1,8 @@
 package me.johngachihi.codestats.mobile.android.ui.firstTimerApp
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -53,16 +50,4 @@ fun FirstTimerApp() {
 private sealed class Screen(val route: String) {
     object CreateUsername : Screen("create-username")
     object EnterExistingUsername : Screen("enter-existing-username")
-}
-
-@Composable
-fun EnterExistingUsernameScreen(
-    navigateToCreateUsername: () -> Unit,
-) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Enter existing username")
-        Button(onClick = { navigateToCreateUsername() }) {
-            Text(text = "I don't have one")
-        }
-    }
 }
