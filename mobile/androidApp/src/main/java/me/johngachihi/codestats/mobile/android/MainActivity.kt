@@ -6,10 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import me.johngachihi.codestats.mobile.android.data.datastore.firstUsePref
+import me.johngachihi.codestats.mobile.android.ui.accountSettings.AccountSettingsScreen
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import me.johngachihi.codestats.mobile.android.ui.firstTimerApp.FirstTimerApp
 import me.johngachihi.codestats.mobile.android.ui.UiState
@@ -41,7 +41,9 @@ fun Root() {
     val isFirstUse by getIsFirstUseState()
 
     when (isFirstUse) {
+        // TODO
         is UiState.Loading -> Text(text = "Loading")
+        // TODO
         is UiState.Error -> Text(text = "Error")
         is UiState.Success -> {
             if ((isFirstUse as UiState.Success<Boolean>).data) {
@@ -84,7 +86,15 @@ fun TheApp() {
                 title = { Text("Codestats") },
                 elevation = 0.dp,
                 contentColor = MaterialTheme.colors.primary,
-                actions = appBarActions
+                actions = {
+                    appBarActions()
+                    IconButton(onClick = { navController.navigate("settings") }) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Account settings"
+                        )
+                    }
+                }
             )
         }
     ) { contentPadding ->
@@ -95,6 +105,9 @@ fun TheApp() {
         ) {
             composable("home") {
                 HomeScreen(setAppBarActions = setAppBarActions)
+            }
+            composable("settings") {
+                AccountSettingsScreen()
             }
         }
     }

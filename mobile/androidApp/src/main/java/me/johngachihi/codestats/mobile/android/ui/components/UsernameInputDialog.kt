@@ -3,6 +3,7 @@ package me.johngachihi.codestats.mobile.android.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,9 +22,13 @@ fun UsernameInputDialog(
 ) {
     val (input, setInput) = remember { mutableStateOf(username) }
 
+    LaunchedEffect(username) {
+        setInput(username)
+    }
+
     if (isOpen)
-        Dialog(onDismissRequest = { }) {
-            Surface {
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Surface(shape = MaterialTheme.shapes.medium) {
                 Column {
                     Box(modifier = Modifier.padding(horizontal = 24.dp)) {
                         Column {

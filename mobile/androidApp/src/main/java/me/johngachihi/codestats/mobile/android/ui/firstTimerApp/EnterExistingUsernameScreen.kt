@@ -11,13 +11,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import me.johngachihi.codestats.mobile.android.ui.UiState
 
 @Composable
 fun EnterExistingUsernameScreen(
     navigateToCreateUsername: () -> Unit,
-    vm: EnterExistingUsernameScreenViewModel = EnterExistingUsernameScreenViewModel()
+    vm: EnterExistingUsernameScreenViewModel = viewModel()
 ) {
     val (usernameInput, setUsernameInput) = remember { mutableStateOf("") }
 
