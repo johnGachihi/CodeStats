@@ -7,31 +7,28 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import me.johngachihi.codestats.mobile.android.ui.UiState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateUsernameScreen(
     navigateToEnterExistingUsernameScreen: () -> Unit,
     showSnackbar: suspend (String, String) -> SnackbarResult = { _, _ -> SnackbarResult.Dismissed },
-    vm: CreateUsernameScreenViewModel = viewModel()
+    vm: CreateUsernameScreenViewModel = koinViewModel()
 ) {
     val (usernameInput, setUsernameInput) = remember { mutableStateOf("") }
 
     val isUsernameAvailable by remember { vm.isUsernameAvailable }
 
-    val context = LocalContext.current
-
     LaunchedEffect(isUsernameAvailable) {
         if (isUsernameAvailable is UiState.Error) {
             when (showSnackbar("Error experienced", "Retry")) {
-                SnackbarResult.ActionPerformed -> vm.onSubmit(usernameInput, context)
+                SnackbarResult.ActionPerformed -> vm.createUsername(usernameInput)
                 else -> {}
             }
         }
@@ -89,7 +86,7 @@ fun CreateUsernameScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             Button(
-                onClick = { vm.onSubmit(usernameInput, context) },
+                onClick = { vm.createUsername(usernameInput) },
                 modifier = Modifier.align(Alignment.End),
                 enabled = isUsernameAvailable !is UiState.Loading && usernameInput.isNotBlank()
             ) {
@@ -102,7 +99,11 @@ fun CreateUsernameScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            Row(modifier = Modifier.clickable { navigateToEnterExistingUsernameScreen() }) {
+            Row(
+                modifier = Modifier.clickable {
+                    navigateToEnterExistingUsernameScreen()
+                }
+            ) {
                 Text(
                     text = "I have one already.",
                     style = MaterialTheme.typography.body2,

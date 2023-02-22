@@ -8,7 +8,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activity"
             android:exported="true"
             android:theme="@style/Theme.Splash"
             android:windowSoftInputMode="adjustResize">

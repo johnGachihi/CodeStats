@@ -3,28 +3,28 @@ package me.johngachihi.codestats.mobile.android.ui.firstTimerApp
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import me.johngachihi.codestats.mobile.android.ui.UiState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EnterExistingUsernameScreen(
     navigateToCreateUsername: () -> Unit,
-    vm: EnterExistingUsernameScreenViewModel = viewModel()
+    vm: EnterExistingUsernameScreenViewModel = koinViewModel()
 ) {
     val (usernameInput, setUsernameInput) = remember { mutableStateOf("") }
 
     val saveUsernameState by remember { vm.saveUsernameState }
-
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -60,7 +60,7 @@ fun EnterExistingUsernameScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             Button(
-                onClick = { vm.setUsername(usernameInput, context) },
+                onClick = { vm.setUsername(usernameInput) },
                 modifier = Modifier.align(Alignment.End),
                 enabled = usernameInput.isNotEmpty()
             ) {

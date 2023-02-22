@@ -1,78 +1,24 @@
-package me.johngachihi.codestats.mobile.android
+package me.johngachihi.codestats.mobile.android.ui
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import me.johngachihi.codestats.mobile.android.data.datastore.firstUsePref
 import me.johngachihi.codestats.mobile.android.ui.accountSettings.AccountSettingsScreen
-import me.johngachihi.codestats.mobile.android.ui.AppTheme
-import me.johngachihi.codestats.mobile.android.ui.firstTimerApp.FirstTimerApp
-import me.johngachihi.codestats.mobile.android.ui.UiState
 import me.johngachihi.codestats.mobile.android.ui.home.HomeScreen
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        installSplashScreen()
-        setContent {
-            AppTheme { Root() }
-        }
-    }
-}
-
 @Composable
-fun Root() {
-    val isFirstUse by getIsFirstUseState()
-
-    when (isFirstUse) {
-        // TODO
-        is UiState.Loading -> Text(text = "Loading")
-        // TODO
-        is UiState.Error -> Text(text = "Error")
-        is UiState.Success -> {
-            if ((isFirstUse as UiState.Success<Boolean>).data) {
-                FirstTimerApp()
-            } else {
-                TheApp()
-            }
-        }
-    }
-}
-
-
-@Composable
-fun getIsFirstUseState(): State<UiState<Boolean>> {
-    val context = LocalContext.current
-    val firstUse by context.firstUsePref.collectAsStateWithLifecycle(initialValue = null)
-
-    return remember(firstUse) {
-        derivedStateOf {
-            when (firstUse) {
-                null -> UiState.Loading
-                else -> UiState.Success(firstUse!!)
-            }
-        }
-    }
-}
-
-@Composable
-fun TheApp() {
+fun MainApp() {
     val navController = rememberNavController()
 
     val (appBarActions, setAppBarActions) = remember {
@@ -110,13 +56,5 @@ fun TheApp() {
                 AccountSettingsScreen()
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewRoot() {
-    AppTheme {
-        Root()
     }
 }
