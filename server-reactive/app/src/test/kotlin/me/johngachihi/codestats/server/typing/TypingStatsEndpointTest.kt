@@ -6,8 +6,7 @@ import me.johngachihi.codestats.core.TypingRateSample
 import me.johngachihi.codestats.core.TypingStats
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -29,12 +28,31 @@ internal class TypingStatsEndpointTest {
     private lateinit var getTypedCharCount: GetTypedCharCountUseCase
 
     @Test
-    fun `calls use cases correctly`() = runTest {
+    fun `calls use-cases correctly`() = runTest {
         `when`(
-            getTypingRateUseCase.invoke(LocalDate.parse("2022-10-24"), Period.Day)
+            getTypingRateUseCase.invoke(LocalDate.parse("2022-10-24"), Period.Day, "a-username")
         ).thenReturn(emptyList())
         `when`(
-            getTypedCharCount.invoke(LocalDate.parse("2022-10-24"), Period.Day)
+            getTypedCharCount.invoke(LocalDate.parse("2022-10-24"), Period.Day, "a-username")
+        ).thenReturn(0)
+
+        webTestClient.get().uri("/activity/typing/2022-10-24/Day?username=a-username")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk
+
+        verify(getTypingRateUseCase)
+            .invoke(LocalDate.parse("2022-10-24"), Period.Day, "a-username")
+        verify(getTypedCharCount)
+            .invoke(LocalDate.parse("2022-10-24"), Period.Day, "a-username")
+
+        //
+
+        `when`(
+            getTypingRateUseCase.invoke(LocalDate.parse("2022-10-24"), Period.Day, null)
+        ).thenReturn(emptyList())
+        `when`(
+            getTypedCharCount.invoke(LocalDate.parse("2022-10-24"), Period.Day, null)
         ).thenReturn(0)
 
         webTestClient.get().uri("/activity/typing/2022-10-24/Day")
@@ -43,10 +61,9 @@ internal class TypingStatsEndpointTest {
             .expectStatus().isOk
 
         verify(getTypingRateUseCase)
-            .invoke(LocalDate.parse("2022-10-24"), Period.Day)
-
+            .invoke(LocalDate.parse("2022-10-24"), Period.Day, null)
         verify(getTypedCharCount)
-            .invoke(LocalDate.parse("2022-10-24"), Period.Day)
+            .invoke(LocalDate.parse("2022-10-24"), Period.Day, null)
     }
 
     @Test

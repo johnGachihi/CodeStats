@@ -16,5 +16,13 @@ interface CodingActivityRepository : CoroutineCrudRepository<CodingEventDataMode
         toExclusive: Instant
     ): Flow<CodingEventDataModel>
 
+    @Query("{ 'username': ?0, 'type': ?1, 'firedAt': { \$gte: ?2, \$lt: ?3 } }")
+    fun findByUsernameRecordedBetween(
+        username: String,
+        type: CodingEventType,
+        from: Instant,
+        toExclusive: Instant
+    ): Flow<CodingEventDataModel>
+
     suspend fun existsByUsername(username: String): Boolean
 }

@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 interface GetTypedCharCountUseCase {
-    suspend operator fun invoke(day: LocalDate, period: Period): Int
+    suspend operator fun invoke(
+        day: LocalDate,
+        period: Period,
+        username: String? = null
+    ): Int
 }
 
 @Service
@@ -16,6 +20,6 @@ class DefaultGetTypedCharCountUseCase(
     private val getTypingActivity: GetTypingActivityUseCase
 ) : GetTypedCharCountUseCase {
 
-    override suspend fun invoke(day: LocalDate, period: Period) =
-        getTypingActivity(day, period).count()
-    }
+    override suspend fun invoke(day: LocalDate, period: Period, username: String?) =
+        getTypingActivity(day, period, username).count()
+}

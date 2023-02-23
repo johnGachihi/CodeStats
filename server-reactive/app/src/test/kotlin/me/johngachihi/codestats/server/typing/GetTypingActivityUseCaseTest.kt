@@ -54,6 +54,42 @@ internal class GetTypingActivityUseCaseTest {
     }
 
     @Test
+    fun `when a username is given, filters result by username`() = runTest {
+        mongoTemplate.insertAll(
+            listOf(
+                makeCharTypedEvent(firedAt = aDay.startOfDay),
+                makeCharTypedEvent(firedAt = aDay.startOfDay, username = "a-username"),
+                makeCharTypedEvent(firedAt = aDay.startOfDay, username = "a-username"),
+                makeCharTypedEvent(firedAt = aDay.startOfDay, username = "another-username"),
+            )
+        ).asFlow().collect()
+
+        val activity = DefaultGetTypingActivityUseCase(codingActivityRepository)
+            .invoke(day = aDay, period = Period.Day, username = "a-username")
+            .toList()
+
+        assertThat(activity).hasSize(2)
+        assertThat(activity).allMatch { it.username == "a-username" }
+    }
+
+    @Test
+    fun `when no username is given, gets all typing activity`() = runTest {
+        mongoTemplate.insertAll(
+            listOf(
+                makeCharTypedEvent(firedAt = aDay.startOfDay),
+                makeCharTypedEvent(firedAt = aDay.startOfDay, username = "a-username"),
+                makeCharTypedEvent(firedAt = aDay.startOfDay, username = "another-username"),
+            )
+        ).asFlow().collect()
+
+        val activity = DefaultGetTypingActivityUseCase(codingActivityRepository)
+            .invoke(day = aDay, period = Period.Day)
+            .toList()
+
+        assertThat(activity).hasSize(3)
+    }
+
+    @Test
     fun `when day's activity is queried, returns activity from start to end of specified day only`() = runTest {
         val startOfDay = aDay.startOfDay
         val startOfNextDay = startOfDay + 24.hours

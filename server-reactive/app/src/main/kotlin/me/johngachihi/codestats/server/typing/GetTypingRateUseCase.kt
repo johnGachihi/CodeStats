@@ -12,7 +12,11 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjuster
 
 interface GetTypingRateUseCase {
-    suspend operator fun invoke(forDay: LocalDate, period: Period): List<TypingRateSample>
+    suspend operator fun invoke(
+        forDay: LocalDate,
+        period: Period,
+        username: String? = null
+    ): List<TypingRateSample>
 }
 
 @Service
@@ -20,8 +24,12 @@ class DefaultGetTypingRateUseCase(
     @Autowired
     private val getTypingActivity: GetTypingActivityUseCase
 ) : GetTypingRateUseCase {
-    override suspend operator fun invoke(forDay: LocalDate, period: Period): List<TypingRateSample> {
-        val typingActivity = getTypingActivity(forDay, period)
+    override suspend operator fun invoke(
+        forDay: LocalDate,
+        period: Period,
+        username: String?
+    ): List<TypingRateSample> {
+        val typingActivity = getTypingActivity(forDay, period, username)
 
         val typingRateBuf = mutableMapOf<LocalDateTime, Int>()
         typingActivity.collect {

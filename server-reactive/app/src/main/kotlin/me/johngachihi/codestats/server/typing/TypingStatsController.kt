@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import kotlin.coroutines.coroutineContext
@@ -26,11 +27,12 @@ class TypingStatsController {
     @GetMapping("/{day}/{period}")
     suspend fun all(
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) day: LocalDate,
-        @PathVariable period: Period
+        @PathVariable period: Period,
+        @RequestParam username: String?
     ): TypingStats {
         val coroutineScope = CoroutineScope(coroutineContext)
-        val rate = coroutineScope.async { getTypingRate(day, period) }
-        val count = coroutineScope.async { getTypedCharCount(day, period) }
+        val rate = coroutineScope.async { getTypingRate(day, period, username) }
+        val count = coroutineScope.async { getTypedCharCount(day, period, username) }
 
         return TypingStats(count = count.await(), rate = rate.await())
     }

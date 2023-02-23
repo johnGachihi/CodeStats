@@ -13,14 +13,22 @@ import java.time.ZoneOffset
 import java.time.temporal.TemporalAdjusters.*
 
 interface GetTypingActivityUseCase {
-    operator fun invoke(day: LocalDate, period: Period): Flow<CodingEventDataModel>
+    operator fun invoke(
+        day: LocalDate,
+        period: Period,
+        username: String? = null
+    ): Flow<CodingEventDataModel>
 }
 
 @Service
 class DefaultGetTypingActivityUseCase(
     @Autowired val codingActivityRepository: CodingActivityRepository
 ) : GetTypingActivityUseCase {
-    override operator fun invoke(day: LocalDate, period: Period): Flow<CodingEventDataModel> {
+    override operator fun invoke(
+        day: LocalDate,
+        period: Period,
+        username: String?
+    ): Flow<CodingEventDataModel> {
         val from = when (period) {
             Period.Day -> day
             Period.Week -> day.with(previousOrSame(MONDAY))
@@ -33,10 +41,19 @@ class DefaultGetTypingActivityUseCase(
             Period.Month -> day.with(firstDayOfNextMonth())
         }
 
-        return codingActivityRepository.findAllRecordedBetween(
-            type = CodingEventType.CHAR_TYPED,
-            from = from.atStartOfDay().toInstant(ZoneOffset.UTC),
-            toExclusive = toExclusive.atStartOfDay().toInstant(ZoneOffset.UTC)
-        )
+        return if (username == null) {
+            codingActivityRepository.findAllRecordedBetween(
+                type = CodingEventType.CHAR_TYPED,
+                from = from.atStartOfDay().toInstant(ZoneOffset.UTC),
+                toExclusive = toExclusive.atStartOfDay().toInstant(ZoneOffset.UTC),
+            )
+        } else {
+            codingActivityRepository.findByUsernameRecordedBetween(
+                username = username,
+                type = CodingEventType.CHAR_TYPED,
+                from = from.atStartOfDay().toInstant(ZoneOffset.UTC),
+                toExclusive = toExclusive.atStartOfDay().toInstant(ZoneOffset.UTC)
+            )
+        }
     }
 }

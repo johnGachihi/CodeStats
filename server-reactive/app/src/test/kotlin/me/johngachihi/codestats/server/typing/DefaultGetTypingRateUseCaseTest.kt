@@ -21,11 +21,13 @@ internal class DefaultGetTypingRateUseCaseTest {
         getTypingRate(forDay = aDay, period = Period.Day)
         getTypingRate(forDay = aDay.plusDays(1), period = Period.Week)
         getTypingRate(forDay = aDay.plusDays(2), period = Period.Month)
+        getTypingRate(forDay = aDay, period = Period.Day, username = "a-username")
 
         assertThat(mockGetTypingActivity.calls).containsExactlyInAnyOrder(
             MockGetTypingActivityUseCase.Params(aDay, Period.Day),
             MockGetTypingActivityUseCase.Params(aDay.plusDays(1), Period.Week),
-            MockGetTypingActivityUseCase.Params(aDay.plusDays(2), Period.Month)
+            MockGetTypingActivityUseCase.Params(aDay.plusDays(2), Period.Month),
+            MockGetTypingActivityUseCase.Params(aDay, Period.Day, username = "a-username"),
         )
     }
 
