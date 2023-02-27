@@ -32,6 +32,22 @@ internal class TypingStatsTest {
             )
             Assert.assertEquals(HttpMethod.Get, method)
         }
+
+        //
+
+        fetchTypingStats(
+            day = LocalDate.of(2021, 1, 1),
+            period = Period.Week,
+            username = "a-username",
+            httpClient = httpClient
+        )
+
+        mockServer.requestHistory[1].run {
+            Assert.assertEquals(
+                "${Constants.BaseUrl}/activity/typing/2021-01-01/Week?username=a-username",
+                url.toString()
+            )
+        }
     }
 
     @Test

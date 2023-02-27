@@ -16,17 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import me.johngachihi.codestats.mobile.android.ui.AppTheme
 import me.johngachihi.codestats.mobile.android.ui.UiState
 import me.johngachihi.codestats.mobile.android.ui.components.HoursOfDayBarChart
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
     setAppBarActions: (@Composable (RowScope.() -> Unit)) -> Unit = { },
-    homeViewModel: HomeViewModel = viewModel()
+    homeViewModel: HomeViewModel = koinViewModel()
 ) {
     val typingStats by remember { homeViewModel.typingStats }
     val day by remember { homeViewModel.day }

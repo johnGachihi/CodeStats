@@ -8,10 +8,18 @@ import me.johngachihi.codestats.core.Period
 import me.johngachihi.codestats.core.TypingStats
 import java.time.LocalDate
 
-suspend fun fetchTypingStats(day: LocalDate, period: Period, httpClient: HttpClient = client): TypingStats {
+suspend fun fetchTypingStats(
+    day: LocalDate,
+    period: Period,
+    username: String? = null,
+    httpClient: HttpClient = client
+): TypingStats {
     return httpClient.get("${Constants.BaseUrl}/activity/typing") {
         url {
             appendPathSegments(day.toString(), period.toString())
+            if (username != null) {
+                parameter("username", username)
+            }
         }
     }.body()
 }
