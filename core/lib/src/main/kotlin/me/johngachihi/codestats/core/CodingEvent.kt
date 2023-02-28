@@ -7,6 +7,7 @@ open class CodingEvent(
     val payload: String,
     val firedAt: Instant,
     val username: String? = null,
+    val language: String? = null,
 )
 
 enum class CodingEventType(val label: String) {
