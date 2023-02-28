@@ -15,7 +15,8 @@ fun makeCharTypedEvent(
     type = CodingEventType.CHAR_TYPED,
     payload = payload.toString(),
     firedAt = firedAt,
-    username = username
+    username = username,
+    language = null
 )
 
 fun makePasteEvent(
@@ -26,7 +27,8 @@ fun makePasteEvent(
     type = CodingEventType.PASTE,
     payload = payload,
     firedAt = firedAt,
-    username = username
+    username = username,
+    language = null
 )
 
 val Int.days: Duration
